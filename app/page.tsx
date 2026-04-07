@@ -26,21 +26,21 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    title: 'JWT Authentication',
+    title: 'Autenticação JWT',
     description:
-      'Secure, stateless authentication powered by JSON Web Tokens. Every learner and instructor gets scoped access — no shared passwords, no session bloat.',
+      'Autenticação segura e sem estado com JSON Web Tokens. Cada aluno e instrutor recebe acesso com escopo definido — sem senhas compartilhadas, sem sobrecarga de sessão.',
     icon: KeyIcon,
   },
   {
-    title: 'Challenge Submissions',
+    title: 'Submissão de Desafios',
     description:
-      'Structured coding and scenario-based challenges let trainees submit work directly in-platform. Automated checks flag results instantly, cutting review overhead.',
+      'Desafios práticos de código e cenários estruturados permitem que os alunos submetam trabalhos diretamente na plataforma. Verificações automáticas sinalizam os resultados na hora, reduzindo o tempo de revisão.',
     icon: ClipboardChecklistIcon,
   },
   {
-    title: 'Performance Dashboards',
+    title: 'Dashboards de Desempenho',
     description:
-      'Real-time dashboards track completion rates, scores, and skill progression across your entire cohort so managers can act on data — not gut feel.',
+      'Painéis em tempo real monitoram taxas de conclusão, pontuações e progressão de habilidades em toda a sua turma, para que gestores atuem com base em dados — não em intuição.',
     icon: ChartVerticalFilledIcon,
   },
 ];
@@ -52,7 +52,7 @@ export default function LandingPage() {
       <Box paddingBlockStart="1600" paddingBlockEnd="1600">
         <BlockStack gap="600" align="center">
           <Text variant="heading2xl" as="h1" alignment="center">
-            Train smarter. Scale faster.
+            Treine com inteligência. Escale com velocidade.
           </Text>
           <Text
             variant="bodyLg"
@@ -60,16 +60,16 @@ export default function LandingPage() {
             alignment="center"
             tone="subdued"
           >
-            Trail closes the feedback loop between IT training delivery and
-            business outcomes — so your team grows at the speed your
-            organisation demands.
+            O Trail fecha o loop de feedback entre a entrega de treinamentos em
+            TI e os resultados de negócio — para que sua equipe cresça na
+            velocidade que a sua organização exige.
           </Text>
           <InlineStack gap="300" align="center">
             <Button variant="primary" size="large" url="/signup">
-              Get started free
+              Comece gratuitamente
             </Button>
             <Button size="large" url="/demo">
-              Watch the demo
+              Assistir à demonstração
             </Button>
           </InlineStack>
         </BlockStack>
@@ -81,7 +81,7 @@ export default function LandingPage() {
       <Box paddingBlockStart="1200" paddingBlockEnd="1200">
         <BlockStack gap="800">
           <Text variant="headingXl" as="h2" alignment="center">
-            Everything you need to run high-throughput IT training
+            Tudo que você precisa para capacitações de TI de alto impacto
           </Text>
           <Grid>
             {features.map((feature) => (
@@ -116,24 +116,25 @@ export default function LandingPage() {
       {/* ── Value Proposition ── */}
       <Box paddingBlockStart="1200" paddingBlockEnd="1600">
         <CalloutCard
-          title="Reduce feedback lead time. Identify hiring talent early."
+          title="Reduza o tempo de feedback. Identifique talentos com antecedência."
           illustration="/callout-illustration.svg"
           primaryAction={{
-            content: 'Start your free pilot',
+            content: 'Iniciar piloto gratuito',
             url: '/signup',
           }}
           secondaryAction={{
-            content: 'Talk to our team',
+            content: 'Falar com nossa equipe',
             url: '/contact',
           }}
         >
           <Text variant="bodyMd" as="p">
-            Traditional IT training programmes suffer from a months-long gap
-            between skill delivery and performance feedback. Trail&apos;s{' '}
-            <strong>Functional Feedback Loop</strong> surfaces learner
-            performance data in real time — so you know which candidates are
-            ready to step up, and which need targeted support, before your
-            next hiring cycle begins.
+            Os programas tradicionais de treinamento em TI sofrem com uma lacuna
+            de meses entre a entrega de habilidades e o feedback de desempenho.
+            O <strong>Loop de Feedback Funcional</strong> do Trail expõe os
+            dados de desempenho dos alunos em tempo real — para que você saiba
+            quais candidatos estão prontos para avançar e quais precisam de
+            suporte direcionado, antes do início do próximo ciclo de
+            contratações.
           </Text>
         </CalloutCard>
       </Box>

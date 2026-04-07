@@ -3,16 +3,16 @@ import Providers from './providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Trail – IT Training Platform',
+  title: 'Trail – Plataforma de Treinamento em TI',
   description:
-    'Scale your IT training program with a Functional Feedback Loop. Reduce feedback lead time and surface top talent faster.',
+    'Escale seu programa de treinamento em TI com um Loop de Feedback Funcional. Reduza o tempo de feedback e identifique os melhores talentos.',
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body>
         <Providers>{children}</Providers>
       </body>

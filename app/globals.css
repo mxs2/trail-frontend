@@ -1,3 +1,31 @@
+/*
+ * Avanade brand overrides
+ * Colors sourced from https://www.avanade.com/en/utility/trademarks
+ * Primary orange: #FF6200 | Dark navy: #1E2738 | Font: Segoe UI
+ */
+:root,
+.p-theme-light {
+  /* Font */
+  --p-font-family-sans: 'Segoe UI', -apple-system, BlinkMacSystemFont,
+    'Helvetica Neue', Arial, sans-serif;
+
+  /* Brand fill – used by primary Button, focus rings, etc. */
+  --p-color-bg-fill-brand: #ff6200;
+  --p-color-bg-fill-brand-hover: #e55a00;
+  --p-color-bg-fill-brand-active: #cc5200;
+  --p-color-bg-fill-brand-selected: #ff6200;
+  --p-color-bg-fill-brand-disabled: rgba(255, 98, 0, 0.35);
+
+  /* Brand text */
+  --p-color-text-brand: #1e2738;
+  --p-color-text-brand-hover: #131b28;
+
+  /* Links */
+  --p-color-text-link: #ff6200;
+  --p-color-text-link-hover: #e55a00;
+  --p-color-text-link-active: #cc5200;
+}
+
 html,
 body {
   height: 100%;
