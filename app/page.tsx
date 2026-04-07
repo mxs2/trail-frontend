@@ -117,7 +117,7 @@ export default function LandingPage() {
       <Box paddingBlockStart="1200" paddingBlockEnd="1600">
         <CalloutCard
           title="Reduce feedback lead time. Identify hiring talent early."
-          illustration="https://cdn.shopify.com/s/assets/admin/checkout/settings-customizecart-705f57c725ac05be2a489568fb6e4ff0562f0f86f5afbed844617dd5d7c91b4b.svg"
+          illustration="/callout-illustration.svg"
           primaryAction={{
             content: 'Start your free pilot',
             url: '/signup',
