@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Grid } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 
 const stats = [
   { value: '10k+', label: 'Desenvolvedores Capacitados' },
@@ -9,7 +9,7 @@ const stats = [
 
 export function LandingStats() {
   return (
-    <Box sx={{ py: 10, bgcolor: '#FAFAFA', borderTop: '1px solid', borderColor: 'grey.200' }}>
+    <Box sx={{ py: 10, bgcolor: 'secondary.main', color: 'secondary.contrastText' }}>
       <Container maxWidth="lg">
         <Box
           sx={{
@@ -19,19 +19,21 @@ export function LandingStats() {
             textAlign: 'center',
           }}
         >
-          {stats.map((stat, index) => (
-            <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {stats.map((stat) => (
+            <Box key={stat.label} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <Typography
                 variant="h3"
                 sx={{
-                  fontWeight: 800,
                   color: 'primary.main',
                   fontSize: { xs: '2.5rem', md: '3.5rem' },
                 }}
               >
                 {stat.value}
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: 'secondary.contrastText', opacity: 0.8, fontWeight: 600 }}
+              >
                 {stat.label}
               </Typography>
             </Box>

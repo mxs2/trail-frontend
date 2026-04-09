@@ -1,5 +1,3 @@
-'use client';
-
 import { Box } from '@mui/material';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
@@ -38,20 +36,11 @@ export default function LandingPage() {
       <Box
         sx={{
           color: '#FFFFFF',
-          background: 'linear-gradient(135deg, #FF2A00 0%, #D8005A 100%)',
+          background: 'linear-gradient(135deg, #1E2738 0%, #131b28 100%)',
           position: 'relative',
           pb: { xs: 8, md: 10 },
         }}
       >
-        {/* Header */}
-        <Box sx={{ py: 3, px: 4, display: 'flex' }}>
-          <img 
-            src="https://ac-landing-pages-user-uploads-production.s3.amazonaws.com/0000118110/85054d7e-4730-47ad-8fc7-736e173fe481.png"
-            alt="Avanade"
-            style={{ height: '72px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-          />
-        </Box>
-
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <LandingHero
             badgeText="Capacitação Inteligente Avanade"
@@ -97,14 +86,14 @@ export default function LandingPage() {
         </Box>
       </Box>
 
-        <LandingFeatures
+      <LandingFeatures
         title="Ambiente de Alto Impacto"
         subtitle="Ferramentas essenciais para garantir que cada participante da trilha atinja o sucesso, desde o primeiro login até o diploma final."
         features={features}
       />
 
       <LandingStats />
-      
+
       <Footer />
     </Box>
   );

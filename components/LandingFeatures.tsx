@@ -20,7 +20,10 @@ export function LandingFeatures({ title, subtitle, features }: LandingFeaturesPr
             >
               {title}
             </Typography>
-            <Typography variant="body1" sx={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'text.secondary' }}>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'text.secondary' }}
+            >
               {subtitle}
             </Typography>
           </Box>
