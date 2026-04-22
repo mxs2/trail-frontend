@@ -1,36 +1,11 @@
 import { createTheme } from '@mui/material/styles';
+import { tokens } from './tokens';
 
 // Dark-first theme. Light theme support is out of scope for MVP.
 // Official Avanade brand color: #FF6200. Prototype used #FF6B2B — official wins.
 
-// Non-MUI tokens used via `sx` in components.
-export const tokens = {
-  bg: {
-    0: '#0B1220', // sidebar
-    3: '#1A2236', // raised / hover cards
-    4: '#222C44', // interactive hover
-  },
-  line: {
-    default: 'rgba(255,255,255,0.07)',
-    strong:  'rgba(255,255,255,0.12)',
-  },
-  text: {
-    2: '#8B96A8', // muted
-    3: '#5B6578', // faint
-  },
-  orange: {
-    soft: 'rgba(255,98,0,0.14)',
-    ring: 'rgba(255,98,0,0.35)',
-  },
-  violet: {
-    main: '#A78BFA',
-    soft: 'rgba(167,139,250,0.12)',
-    ring: 'rgba(167,139,250,0.30)',
-  },
-  success: {
-    soft: 'rgba(94,234,212,0.12)',
-  },
-} as const;
+// Re-export so callers that already import from lib/theme keep working.
+export { tokens };
 
 const theme = createTheme({
   palette: {
