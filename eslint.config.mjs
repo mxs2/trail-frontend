@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
+    // Design reference is plain CDN-based JSX, not part of the Next.js app.
+    'design-reference/**',
   ]),
 ]);
 

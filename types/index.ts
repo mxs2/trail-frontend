@@ -1,21 +1,12 @@
-export interface Trail {
-  id: string;
-  title: string;
-  description: string;
-  duration: number; // in minutes
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
-  status: 'draft' | 'published' | 'archived';
-}
+export type {
+  LessonType,
+  TrailLevel,
+  Lesson,
+  TrailModule,
+  Trail,
+  AiSugestao,
+  AiRecomendacao,
+  TrilhaPersonalizada,
+} from './trail';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'user';
-}
-
-export interface DashboardMetrics {
-  totalUsers: number;
-  activeTrails: number;
-  completionsThisWeek: number;
-}
+export type { UserRole, User, WeeklyActivity } from './user';

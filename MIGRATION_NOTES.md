@@ -114,4 +114,27 @@ e usados via `sx` nos componentes.
 
 ---
 
-*Última atualização: Fase 1 — Fundação (tema, fontes, providers)*
+## Desvios de Tipagem (Fase 2)
+
+Campos do protótipo que não existiam no plano original e foram incorporados à tipagem:
+
+| Campo | Tipo | Origem | Decisão |
+|---|---|---|---|
+| `Trail.subtitle` | `string` | `data.js` | Adicionado — frase descritiva curta da trilha |
+| `Trail.color` | `string` (hex) | `data.js` | Adicionado — accent color individual de cada trilha |
+| `Trail.hoursTotal/hoursDone` | `number` | `data.js` | Adicionado — separado de `lessonsTotal/lessonsDone` |
+| `TrailModule.id` | `string` | gerado | Prototype não tinha IDs nos módulos; adicionados com padrão `{trailId}-m{index}` |
+| `Lesson.id` | `string` | gerado | Prototype não tinha IDs nas aulas; adicionados com padrão `{trailId}-m{mIdx}-l{lIdx}` |
+| `WeeklyActivity` | interface | `data.js` | Movida para `types/user.ts` (é dado do usuário, não da trilha) |
+
+Campos do plano original que **não existem** no protótipo e foram mantidos mesmo assim:
+
+| Campo | Tipo | Justificativa |
+|---|---|---|
+| `User.avatarInitials` | `string` | Prototype usa initials no sidebar profile; campo explícito facilita componentes |
+| `User.level` | `number` | Sidebar exibe "Aluno · Nível 2"; campo necessário |
+| `User.joinedAt` | `string` | Necessário para cálculos de tempo ("5ª semana de estudos") |
+
+---
+
+*Última atualização: Fase 2 — Tipos, Mocks, Store e API*
