@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import Link from 'next/link';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -70,10 +73,10 @@ export default function LandingNavbar() {
       </Box>
 
       <Box sx={{ ml: 'auto', display: 'flex', gap: 1.25, alignItems: 'center' }}>
-        <Button href="/signin" variant="text" size="small">
+        <Button component={Link} href="/signin" variant="text" size="small">
           Entrar
         </Button>
-        <Button href="/signup" variant="contained" size="small">
+        <Button component={Link} href="/signup" variant="contained" size="small">
           Criar conta
         </Button>
       </Box>
