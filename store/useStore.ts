@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { User, Trail, Lesson, TrilhaPersonalizada } from '../types';
 
 interface AppState {
@@ -22,22 +23,31 @@ interface AppState {
   setIsLoading: (isLoading: boolean) => void;
 }
 
-export const useStore = create<AppState>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
+export const useStore = create<AppState>()(
+  persist(
+    (set) => ({
+      user: null,
+      setUser: (user) => set({ user }),
 
-  trails: [],
-  setTrails: (trails) => set({ trails }),
+      trails: [],
+      setTrails: (trails) => set({ trails }),
 
-  currentTrail: null,
-  setCurrentTrail: (currentTrail) => set({ currentTrail }),
+      currentTrail: null,
+      setCurrentTrail: (currentTrail) => set({ currentTrail }),
 
-  currentLesson: null,
-  setCurrentLesson: (currentLesson) => set({ currentLesson }),
+      currentLesson: null,
+      setCurrentLesson: (currentLesson) => set({ currentLesson }),
 
-  aiRecomendacao: null,
-  setAiRecomendacao: (aiRecomendacao) => set({ aiRecomendacao }),
+      aiRecomendacao: null,
+      setAiRecomendacao: (aiRecomendacao) => set({ aiRecomendacao }),
 
-  isLoading: false,
-  setIsLoading: (isLoading) => set({ isLoading }),
-}));
+      isLoading: false,
+      setIsLoading: (isLoading) => set({ isLoading }),
+    }),
+    {
+      name: 'trail-auth',
+      // Only user survives page refresh. Everything else is re-fetched on mount.
+      partialize: (state) => ({ user: state.user }),
+    }
+  )
+);

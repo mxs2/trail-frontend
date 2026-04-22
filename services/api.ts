@@ -8,6 +8,15 @@ import { getTrilhaPersonalizada as getTrilhaPersonalizadaMock } from '../mocks/g
 const delay = <T>(value: T, ms: number): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms));
 
+function initials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('') || 'U';
+}
+
 export const api = {
   async getTrails(): Promise<Trail[]> {
     return delay([...MOCK_TRAILS], 500);
@@ -37,5 +46,16 @@ export const api = {
 
   async getTrilhaPersonalizada(userId: string): Promise<TrilhaPersonalizada> {
     return getTrilhaPersonalizadaMock(userId);
+  },
+
+  async login(_email: string, _password: string): Promise<User> {
+    return delay({ ...MOCK_USER }, 600);
+  },
+
+  async register(name: string, email: string, _password: string): Promise<User> {
+    return delay(
+      { ...MOCK_USER, name, email, avatarInitials: initials(name) },
+      800
+    );
   },
 };

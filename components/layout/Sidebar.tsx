@@ -3,8 +3,8 @@
 // Icons: @mui/icons-material — already installed, avoids adding lucide-react dependency.
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import Logo from '../ui/Logo';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
@@ -188,16 +188,24 @@ export default function Sidebar() {
         display: 'flex',
         flexDirection: 'column',
         gap: '6px',
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        overflowY: 'auto',
+        height: '100%',
+        overflow: 'hidden',
         flexShrink: 0,
       }}
     >
       {/* Logo */}
-      <Box sx={{ display: 'flex', alignItems: 'center', px: '10px', pb: '16px', pt: '8px', gap: 1 }}>
-        <Image src="/trail-logo.png" alt="Trail" width={92} height={22} style={{ filter: 'brightness(0) invert(1)', opacity: 0.95 }} />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          px: '10px',
+          pb: '16px',
+          pt: '8px',
+          gap: 1,
+          flexShrink: 0,
+        }}
+      >
+        <Logo />
         <Box
           component="span"
           sx={{
@@ -215,33 +223,45 @@ export default function Sidebar() {
         </Box>
       </Box>
 
-      {/* Main navigation */}
-      <nav>
-        <SectionLabel>Navegação</SectionLabel>
-        {MAIN_NAV.map((def) => (
-          <NavItem
-            key={def.id}
-            def={def}
-            active={def.isActive(pathname)}
-            count={def.id === 'trilhas' && trails.length > 0 ? trails.length : undefined}
-          />
-        ))}
-      </nav>
+      {/* Scrollable nav area — grows to fill, scrolls when items overflow */}
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+        }}
+      >
+        {/* Main navigation */}
+        <nav>
+          <SectionLabel>Navegação</SectionLabel>
+          {MAIN_NAV.map((def) => (
+            <NavItem
+              key={def.id}
+              def={def}
+              active={def.isActive(pathname)}
+              count={def.id === 'trilhas' && trails.length > 0 ? trails.length : undefined}
+            />
+          ))}
+        </nav>
 
-      {/* General navigation */}
-      <nav aria-label="Geral">
-        <SectionLabel>Geral</SectionLabel>
-        {GENERAL_NAV.map((def) => (
-          <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
-        ))}
-        {isMentor &&
-          MENTOR_NAV.map((def) => (
+        {/* General navigation */}
+        <nav aria-label="Geral">
+          <SectionLabel>Geral</SectionLabel>
+          {GENERAL_NAV.map((def) => (
             <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
           ))}
-      </nav>
+          {isMentor &&
+            MENTOR_NAV.map((def) => (
+              <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
+            ))}
+        </nav>
+      </Box>
 
-      {/* Profile footer */}
-      <Box sx={{ mt: 'auto' }}>
+      {/* Profile footer — always visible, never compressed */}
+      <Box sx={{ flexShrink: 0 }}>
         {user ? (
           <Box
             sx={{

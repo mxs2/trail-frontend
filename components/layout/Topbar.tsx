@@ -51,16 +51,13 @@ export default function Topbar() {
       component="header"
       sx={{
         height: 60,
+        flexShrink: 0,
         borderBottom: `1px solid ${tokens.line.default}`,
         display: 'flex',
         alignItems: 'center',
         px: 4,
         gap: 2.5,
         bgcolor: 'background.default',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
-        backdropFilter: 'blur(12px)',
       }}
     >
       {/* Breadcrumbs */}

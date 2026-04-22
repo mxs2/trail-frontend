@@ -137,4 +137,41 @@ Campos do plano original que **não existem** no protótipo e foram mantidos mes
 
 ---
 
-*Última atualização: Fase 2 — Tipos, Mocks, Store e API*
+---
+
+## Fase 5 — Autenticação
+
+### Arquivos criados
+
+| Arquivo | Descrição |
+|---|---|
+| `app/(auth)/signin/page.tsx` | Página de login |
+| `app/(auth)/signup/page.tsx` | Página de cadastro |
+| `components/auth/AuthShell.tsx` | Wrapper 50/50 split (form + painel de features) |
+| `components/auth/PasswordField.tsx` | MUI TextField com toggle show/hide |
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `app/(auth)/layout.tsx` | Simplificado — AuthShell gerencia o layout full-screen |
+| `services/api.ts` | Adicionados `login()` e `register()` (mock com delay) |
+| `store/useStore.ts` | Adicionado middleware `persist` do Zustand |
+
+### Persistência de sessão
+
+`user` persiste em `localStorage` via `zustand/persist` (key: `trail-auth`).
+Somente `user` é persistido via `partialize` — trails, currentTrail, aiRecomendacao
+e isLoading são re-fetched ao montar cada página.
+
+**Quando auth real for implementada:** substituir por httpOnly cookie server-side
+e remover o middleware `persist` do store (ou mantê-lo como cache secundário).
+
+### Fluxo de navegação
+
+- `signin` success → `/dashboard`
+- `signup` success → `/onboarding` (rota existe no mapa; página implementada na Fase 6)
+- Google/GitHub: botões presentes na UI, sem implementação (OAuth fora do MVP)
+- "Esqueci minha senha": link presente na UI, sem página (fora do MVP)
+
+*Última atualização: Fase 5 — Autenticação*

@@ -15,6 +15,15 @@ const eslintConfig = [
   },
   ...nextVitals,
   ...nextTs,
+  {
+    rules: {
+      // Honour the _param convention for intentionally unused function arguments.
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

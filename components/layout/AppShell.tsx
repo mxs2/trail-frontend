@@ -12,18 +12,19 @@ export default function AppShell({ children }: AppShellProps) {
       sx={{
         display: 'grid',
         gridTemplateColumns: `${SIDEBAR_WIDTH}px 1fr`,
-        minHeight: '100vh',
+        height: '100vh',
       }}
     >
       <Sidebar />
 
-      {/* Main column: sticky topbar + scrollable content */}
-      <Box sx={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      {/* Main column: fixed topbar + independently scrollable content */}
+      <Box sx={{ minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Topbar />
         <Box
           component="main"
           sx={{
             flex: 1,
+            overflowY: 'auto',
             px: 5,
             pt: '36px',
             pb: 10,
