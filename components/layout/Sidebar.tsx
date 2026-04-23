@@ -41,9 +41,8 @@ const MAIN_NAV: NavDef[] = [
   {
     id: 'trilhas',
     label: 'Minhas Trilhas',
-    href: '/dashboard',
+    href: '/trilha/react-fundamentals',
     Icon: LayersOutlinedIcon,
-    // No dedicated list page — links to dashboard, active on trail detail routes
     isActive: (p) => p.startsWith('/trilha'),
   },
   {
