@@ -77,8 +77,9 @@ export default function LandingHero() {
           mb: 5,
         }}
       >
-        Trail gera uma trilha única a partir dos seus objetivos, tempo disponível e nível atual —
-        e adapta em tempo real conforme você avança. Acompanhada por mentores humanos, não só por um bot.
+        Trail gera uma trilha única a partir dos seus objetivos, tempo disponível e nível atual — e
+        adapta em tempo real conforme você avança. Acompanhada por mentores humanos, não só por um
+        bot.
       </Typography>
 
       {/* CTAs */}

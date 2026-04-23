@@ -11,30 +11,30 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main:          '#FF6200',
-      light:         '#FF7A1F',
-      dark:          '#E55A00',
-      contrastText:  '#F5F1EA',
+      main: '#FF6200',
+      light: '#FF7A1F',
+      dark: '#E55A00',
+      contrastText: '#F5F1EA',
     },
     secondary: {
-      main:          '#A78BFA', // violet — AI accent
-      light:         '#C4B5FD',
-      dark:          '#7C5CFA',
-      contrastText:  '#F5F1EA',
+      main: '#A78BFA', // violet — AI accent
+      light: '#C4B5FD',
+      dark: '#7C5CFA',
+      contrastText: '#F5F1EA',
     },
     background: {
       default: '#0E1524', // --bg-1
-      paper:   '#131B2E', // --bg-2
+      paper: '#131B2E', // --bg-2
     },
     text: {
-      primary:   '#F5F1EA', // --text-0
+      primary: '#F5F1EA', // --text-0
       secondary: '#C8CEDB', // --text-1
-      disabled:  '#8B96A8', // --text-2
+      disabled: '#8B96A8', // --text-2
     },
     divider: 'rgba(255,255,255,0.07)',
     success: { main: '#5EEAD4', contrastText: '#0B1220' },
     warning: { main: '#FBBF24', contrastText: '#0B1220' },
-    error:   { main: '#F87171', contrastText: '#F5F1EA' },
+    error: { main: '#F87171', contrastText: '#F5F1EA' },
   },
 
   typography: {
@@ -51,7 +51,7 @@ const theme = createTheme({
     // caption doubles as mono label (JetBrains Mono via --f-mono)
     caption: {
       fontFamily: 'var(--f-mono)',
-      fontSize:   '0.6875rem',
+      fontSize: '0.6875rem',
       letterSpacing: '0.08em',
     },
     button: { textTransform: 'none', fontWeight: 600 },
@@ -76,9 +76,9 @@ const theme = createTheme({
           '&::-webkit-scrollbar-track': { background: 'transparent' },
         },
         '*:focus-visible': {
-          outline:       '2px solid #FF6200',
+          outline: '2px solid #FF6200',
           outlineOffset: '2px',
-          borderRadius:  '6px',
+          borderRadius: '6px',
         },
       },
     },
@@ -87,15 +87,15 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 999,
-          boxShadow:    'none',
-          transition:   'background 120ms, color 120ms, border-color 120ms',
+          boxShadow: 'none',
+          transition: 'background 120ms, color 120ms, border-color 120ms',
           '&:hover': { boxShadow: 'none' },
         },
         outlined: {
           borderColor: 'rgba(255,255,255,0.12)',
-          color:       '#C8CEDB',
+          color: '#C8CEDB',
           '&:hover': {
-            background:  'rgba(255,255,255,0.05)',
+            background: 'rgba(255,255,255,0.05)',
             borderColor: 'rgba(255,255,255,0.2)',
           },
         },
@@ -103,7 +103,7 @@ const theme = createTheme({
           color: '#C8CEDB',
           '&:hover': {
             background: 'rgba(255,255,255,0.05)',
-            color:      '#F5F1EA',
+            color: '#F5F1EA',
           },
         },
       },
@@ -113,7 +113,7 @@ const theme = createTheme({
           props: { variant: 'contained', color: 'primary' },
           style: {
             background: '#FF6200',
-            '&:hover':  { background: '#FF7A1F' },
+            '&:hover': { background: '#FF7A1F' },
             '&:active': { background: '#E55A00' },
           },
         },
@@ -121,9 +121,9 @@ const theme = createTheme({
           props: { variant: 'outlined', color: 'primary' },
           style: {
             borderColor: 'rgba(255,98,0,0.35)',
-            color:       '#FF6200',
+            color: '#FF6200',
             '&:hover': {
-              background:  'rgba(255,98,0,0.08)',
+              background: 'rgba(255,98,0,0.08)',
               borderColor: '#FF6200',
             },
           },
@@ -134,10 +134,10 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          background:  '#131B2E',
-          border:      '1px solid rgba(255,255,255,0.07)',
+          background: '#131B2E',
+          border: '1px solid rgba(255,255,255,0.07)',
           borderRadius: 12, // --r-md
-          boxShadow:   'none',
+          boxShadow: 'none',
         },
       },
     },
@@ -155,13 +155,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            background:   '#131B2E',
+            background: '#131B2E',
             borderRadius: 8,
-            '& fieldset':              { borderColor: 'rgba(255,255,255,0.12)' },
-            '&:hover fieldset':        { borderColor: 'rgba(255,255,255,0.2)' },
-            '&.Mui-focused fieldset':  { borderColor: '#FF6200' },
+            '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+            '&.Mui-focused fieldset': { borderColor: '#FF6200' },
           },
-          '& .MuiInputLabel-root':           { color: '#8B96A8' },
+          '& .MuiInputLabel-root': { color: '#8B96A8' },
           '& .MuiInputLabel-root.Mui-focused': { color: '#FF6200' },
         },
       },
@@ -170,9 +170,9 @@ const theme = createTheme({
     MuiLinearProgress: {
       styleOverrides: {
         root: {
-          height:       4,
+          height: 4,
           borderRadius: 999,
-          background:   'rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.08)',
         },
         bar: { borderRadius: 999 },
       },
@@ -182,9 +182,9 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 6,
-          fontWeight:   500,
-          fontSize:     '0.75rem',
-          height:       24,
+          fontWeight: 500,
+          fontSize: '0.75rem',
+          height: 24,
         },
       },
     },
@@ -198,9 +198,9 @@ const theme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          background:   '#222C44',
-          color:        '#F5F1EA',
-          fontSize:     '0.75rem',
+          background: '#222C44',
+          color: '#F5F1EA',
+          fontSize: '0.75rem',
           borderRadius: 6,
         },
       },

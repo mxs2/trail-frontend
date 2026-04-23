@@ -23,7 +23,11 @@ export default function DashboardPage() {
   const firstName = user?.name?.split(' ')[0] ?? 'Aluno';
   const activeTrail = trails[0];
   const today = new Date();
-  const dateStr = today.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const dateStr = today.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
 
   const aiTitle = aiRecomendacao?.trilhaPrincipal.title ?? 'Próximo passo sugerido';
   const aiDesc = aiRecomendacao?.recomendacao.descricao ?? activeTrail?.aiNote ?? '';
@@ -116,7 +120,9 @@ export default function DashboardPage() {
             <Typography sx={{ fontWeight: 600, fontSize: '1.125rem', mb: 0.5 }}>
               {activeTrail.title}
             </Typography>
-            <Typography sx={{ fontSize: '0.8125rem', color: tokens.text[2], mb: 2, lineHeight: 1.4 }}>
+            <Typography
+              sx={{ fontSize: '0.8125rem', color: tokens.text[2], mb: 2, lineHeight: 1.4 }}
+            >
               {activeTrail.subtitle}
             </Typography>
             <LinearProgress
@@ -184,10 +190,10 @@ export default function DashboardPage() {
               RECOMENDAÇÃO DA IA
             </Typography>
           </Box>
-          <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', mb: 1 }}>
-            {aiTitle}
-          </Typography>
-          <Typography sx={{ fontSize: '0.8125rem', color: tokens.text[2], lineHeight: 1.5, flex: 1 }}>
+          <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', mb: 1 }}>{aiTitle}</Typography>
+          <Typography
+            sx={{ fontSize: '0.8125rem', color: tokens.text[2], lineHeight: 1.5, flex: 1 }}
+          >
             {aiDesc}
           </Typography>
           <Button
@@ -290,7 +296,13 @@ export default function DashboardPage() {
                       borderRadius: '4px 4px 2px 2px',
                     }}
                   />
-                  <Typography sx={{ fontSize: '0.625rem', color: tokens.text[3], fontFamily: 'var(--f-mono)' }}>
+                  <Typography
+                    sx={{
+                      fontSize: '0.625rem',
+                      color: tokens.text[3],
+                      fontFamily: 'var(--f-mono)',
+                    }}
+                  >
                     {d.day}
                   </Typography>
                 </Box>
@@ -308,7 +320,9 @@ export default function DashboardPage() {
             borderRadius: '16px',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
+          >
             <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem' }}>Minhas trilhas</Typography>
             <Typography sx={{ fontSize: '0.75rem', color: 'primary.main', cursor: 'pointer' }}>
               Ver todas
@@ -349,7 +363,9 @@ export default function DashboardPage() {
                     >
                       {trail.title}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.75rem', color: tokens.text[2], flexShrink: 0, ml: 1 }}>
+                    <Typography
+                      sx={{ fontSize: '0.75rem', color: tokens.text[2], flexShrink: 0, ml: 1 }}
+                    >
                       {trail.progress}%
                     </Typography>
                   </Box>

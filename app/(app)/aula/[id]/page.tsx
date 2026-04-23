@@ -119,10 +119,25 @@ export default function AulaPage() {
 
   if (!found) {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 2 }}>
-        <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28 }}>Aula não encontrada</Typography>
-        <Typography sx={{ color: tokens.text[2] }}>O ID <code>{lessonId}</code> não corresponde a nenhuma aula.</Typography>
-        <Button variant="contained" onClick={() => router.push('/dashboard')}>Voltar ao dashboard</Button>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '60vh',
+          gap: 2,
+        }}
+      >
+        <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28 }}>
+          Aula não encontrada
+        </Typography>
+        <Typography sx={{ color: tokens.text[2] }}>
+          O ID <code>{lessonId}</code> não corresponde a nenhuma aula.
+        </Typography>
+        <Button variant="contained" onClick={() => router.push('/dashboard')}>
+          Voltar ao dashboard
+        </Button>
       </Box>
     );
   }
@@ -141,7 +156,10 @@ export default function AulaPage() {
     setMessages((prev) => [
       ...prev,
       { role: 'user', text },
-      { role: 'ai', text: 'Entendido! Essa é uma ótima observação. Vou elaborar melhor quando você terminar essa seção da aula.' },
+      {
+        role: 'ai',
+        text: 'Entendido! Essa é uma ótima observação. Vou elaborar melhor quando você terminar essa seção da aula.',
+      },
     ]);
     setChatMsg('');
   };
@@ -163,7 +181,6 @@ export default function AulaPage() {
     >
       {/* ── COLUNA PRINCIPAL ── */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-
         {/* Breadcrumb */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
           <Link href={`/trilha/${trail.id}`} style={{ textDecoration: 'none' }}>
@@ -237,7 +254,14 @@ export default function AulaPage() {
             }}
           >
             <Typography sx={{ fontSize: 48, lineHeight: 1, opacity: 0.3 }}>{'<>'}</Typography>
-            <Typography sx={{ fontFamily: 'var(--f-mono)', fontSize: 11, color: tokens.text[3], opacity: 0.5 }}>
+            <Typography
+              sx={{
+                fontFamily: 'var(--f-mono)',
+                fontSize: 11,
+                color: tokens.text[3],
+                opacity: 0.5,
+              }}
+            >
               vídeo placeholder · {lesson.duration}
             </Typography>
           </Box>
@@ -279,8 +303,12 @@ export default function AulaPage() {
               alignItems: 'flex-end',
             }}
           >
-            <Typography sx={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{lesson.title}</Typography>
-            <Typography sx={{ fontFamily: 'var(--f-mono)', fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>
+            <Typography sx={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
+              {lesson.title}
+            </Typography>
+            <Typography
+              sx={{ fontFamily: 'var(--f-mono)', fontSize: 11, color: 'rgba(255,255,255,0.6)' }}
+            >
               {lesson.duration}
             </Typography>
           </Box>
@@ -316,8 +344,11 @@ export default function AulaPage() {
           >
             {lesson.title}
           </Typography>
-          <Typography sx={{ color: tokens.text[2], fontSize: '0.875rem', lineHeight: 1.6, maxWidth: 640 }}>
-            Compartilhe estado entre componentes sem prop drilling. Nesta aula, vamos criar um ThemeContext do zero e entender quando Context é a ferramenta certa — e quando não é.
+          <Typography
+            sx={{ color: tokens.text[2], fontSize: '0.875rem', lineHeight: 1.6, maxWidth: 640 }}
+          >
+            Compartilhe estado entre componentes sem prop drilling. Nesta aula, vamos criar um
+            ThemeContext do zero e entender quando Context é a ferramenta certa — e quando não é.
           </Typography>
         </Box>
 
@@ -392,7 +423,9 @@ export default function AulaPage() {
                     }}
                   >
                     <Box sx={{ color: tokens.text[2] }}>{TYPE_ICON[r.type]}</Box>
-                    <Typography sx={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{r.title}</Typography>
+                    <Typography sx={{ fontSize: 13, fontWeight: 500, flex: 1 }}>
+                      {r.title}
+                    </Typography>
                     <ArrowForwardIcon sx={{ fontSize: 14, color: tokens.text[3] }} />
                   </Box>
                 ))}
@@ -414,7 +447,9 @@ export default function AulaPage() {
             flexWrap: 'wrap',
           }}
         >
-          <Typography sx={{ fontSize: 13, color: tokens.text[2], mr: 0.5 }}>Como foi essa aula?</Typography>
+          <Typography sx={{ fontSize: 13, color: tokens.text[2], mr: 0.5 }}>
+            Como foi essa aula?
+          </Typography>
           {FEEDBACKS.map((f) => (
             <Button
               key={f.key}

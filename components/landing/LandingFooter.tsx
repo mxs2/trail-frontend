@@ -88,9 +88,7 @@ export default function LandingFooter() {
           height={16}
           style={{ filter: 'brightness(0) invert(1)', opacity: 0.4 }}
         />
-        <Typography
-          sx={{ ml: 'auto', fontSize: 12, color: tokens.text[3] }}
-        >
+        <Typography sx={{ ml: 'auto', fontSize: 12, color: tokens.text[3] }}>
           © 2026 Trail · Projeto acadêmico Embarque Digital × Avanade
         </Typography>
       </Box>

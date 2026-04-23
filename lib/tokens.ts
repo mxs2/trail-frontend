@@ -9,7 +9,7 @@ export const tokens = {
   },
   line: {
     default: 'rgba(255,255,255,0.07)',
-    strong:  'rgba(255,255,255,0.12)',
+    strong: 'rgba(255,255,255,0.12)',
   },
   text: {
     2: '#8B96A8', // muted

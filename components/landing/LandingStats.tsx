@@ -7,20 +7,17 @@ const STEPS = [
   {
     n: '01',
     title: 'Conte seu objetivo',
-    description:
-      'Vaga dev, trocar de stack, freelas. A IA usa isso como norte do seu aprendizado.',
+    description: 'Vaga dev, trocar de stack, freelas. A IA usa isso como norte do seu aprendizado.',
   },
   {
     n: '02',
     title: 'Receba sua trilha',
-    description:
-      'Módulos, aulas e exercícios montados sob medida. Nada genérico, nada padrão.',
+    description: 'Módulos, aulas e exercícios montados sob medida. Nada genérico, nada padrão.',
   },
   {
     n: '03',
     title: 'Avance no seu ritmo',
-    description:
-      'Conclua aulas, marque feedback, peça revisões. A trilha se adapta a cada passo.',
+    description: 'Conclua aulas, marque feedback, peça revisões. A trilha se adapta a cada passo.',
   },
 ];
 

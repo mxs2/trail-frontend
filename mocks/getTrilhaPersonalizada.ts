@@ -26,8 +26,6 @@ const PERSONALIZACAO: Record<string, TrilhaPersonalizada> = {
 };
 
 export async function getTrilhaPersonalizada(userId: string): Promise<TrilhaPersonalizada> {
-  await new Promise<void>((resolve) =>
-    setTimeout(resolve, 800 + Math.random() * 400)
-  );
+  await new Promise<void>((resolve) => setTimeout(resolve, 800 + Math.random() * 400));
   return PERSONALIZACAO[userId] ?? PERSONALIZACAO['default'];
 }

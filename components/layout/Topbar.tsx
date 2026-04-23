@@ -64,7 +64,13 @@ export default function Topbar() {
       <Box
         component="nav"
         aria-label="Breadcrumb"
-        sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: 13, color: 'text.secondary' }}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          fontSize: 13,
+          color: 'text.secondary',
+        }}
       >
         {crumbs.map((crumb, i) => (
           <Box key={crumb.label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

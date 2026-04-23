@@ -109,7 +109,10 @@ export default function SignUpPage() {
           label="E-mail"
           type="email"
           value={email}
-          onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setEmailError('');
+          }}
           error={!!emailError}
           helperText={emailError}
           fullWidth
@@ -171,7 +174,11 @@ export default function SignUpPage() {
         <Box
           component={Link}
           href="/signin"
-          sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+          sx={{
+            color: 'primary.main',
+            textDecoration: 'none',
+            '&:hover': { textDecoration: 'underline' },
+          }}
         >
           Entrar
         </Box>

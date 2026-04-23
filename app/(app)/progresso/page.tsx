@@ -114,12 +114,18 @@ export default function ProgressoPage() {
             }}
           >
             <Box sx={{ color: tokens.text[2], mb: 1 }}>{s.icon}</Box>
-            <Typography
-              sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1, mb: 0.5 }}
-            >
+            <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1, mb: 0.5 }}>
               {s.value}
             </Typography>
-            <Typography sx={{ fontSize: 11, color: tokens.text[2], fontFamily: 'var(--f-mono)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+            <Typography
+              sx={{
+                fontSize: 11,
+                color: tokens.text[2],
+                fontFamily: 'var(--f-mono)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.07em',
+              }}
+            >
               {s.label}
             </Typography>
           </Box>
@@ -128,9 +134,7 @@ export default function ProgressoPage() {
 
       {/* Trilhas em andamento */}
       <Box>
-        <Typography
-          sx={{ fontFamily: 'var(--f-serif)', fontSize: 20, mb: 1.75 }}
-        >
+        <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 20, mb: 1.75 }}>
           Trilhas em andamento
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
@@ -164,10 +168,26 @@ export default function ProgressoPage() {
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
-                  <Typography sx={{ fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', mr: 2 }}>
+                  <Typography
+                    sx={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      mr: 2,
+                    }}
+                  >
                     {trail.title}
                   </Typography>
-                  <Typography sx={{ fontSize: 12, color: tokens.text[2], flexShrink: 0, fontFamily: 'var(--f-mono)' }}>
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: tokens.text[2],
+                      flexShrink: 0,
+                      fontFamily: 'var(--f-mono)',
+                    }}
+                  >
                     {trail.progress}%
                   </Typography>
                 </Box>
@@ -182,7 +202,8 @@ export default function ProgressoPage() {
                   }}
                 />
                 <Typography sx={{ fontSize: 11, color: tokens.text[2], mt: 0.75 }}>
-                  {trail.lessonsDone} de {trail.lessonsTotal} aulas · {trail.hoursDone}h / {trail.hoursTotal}h
+                  {trail.lessonsDone} de {trail.lessonsTotal} aulas · {trail.hoursDone}h /{' '}
+                  {trail.hoursTotal}h
                 </Typography>
               </Box>
               <Button
@@ -247,7 +268,9 @@ export default function ProgressoPage() {
                 {a.icon}
               </Box>
               <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{a.title}</Typography>
-              <Typography sx={{ fontSize: 11, color: tokens.text[2], lineHeight: 1.4 }}>{a.desc}</Typography>
+              <Typography sx={{ fontSize: 11, color: tokens.text[2], lineHeight: 1.4 }}>
+                {a.desc}
+              </Typography>
             </Box>
           ))}
         </Box>

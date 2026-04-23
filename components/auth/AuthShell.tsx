@@ -156,9 +156,7 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
                   <CheckIcon sx={{ fontSize: 15 }} />
                 </Box>
                 <Box>
-                  <Typography sx={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                    {f.title}
-                  </Typography>
+                  <Typography sx={{ fontSize: '0.875rem', fontWeight: 600 }}>{f.title}</Typography>
                   <Typography sx={{ fontSize: '0.8125rem', color: tokens.text[2], mt: '2px' }}>
                     {f.desc}
                   </Typography>

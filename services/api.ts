@@ -9,12 +9,14 @@ const delay = <T>(value: T, ms: number): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms));
 
 function initials(name: string): string {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
-    .join('') || 'U';
+  return (
+    name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join('') || 'U'
+  );
 }
 
 export const api = {
@@ -23,7 +25,10 @@ export const api = {
   },
 
   async getTrailById(id: string): Promise<Trail | undefined> {
-    return delay(MOCK_TRAILS.find((t) => t.id === id), 500);
+    return delay(
+      MOCK_TRAILS.find((t) => t.id === id),
+      500
+    );
   },
 
   async getLessonById(id: string): Promise<Lesson | undefined> {
@@ -53,9 +58,6 @@ export const api = {
   },
 
   async register(name: string, email: string, _password: string): Promise<User> {
-    return delay(
-      { ...MOCK_USER, name, email, avatarInitials: initials(name) },
-      800
-    );
+    return delay({ ...MOCK_USER, name, email, avatarInitials: initials(name) }, 800);
   },
 };

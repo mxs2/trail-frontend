@@ -47,11 +47,7 @@ export default function PasswordField({
                 sx={{ color: 'text.disabled' }}
                 aria-label={show ? 'Ocultar senha' : 'Mostrar senha'}
               >
-                {show ? (
-                  <VisibilityOff fontSize="small" />
-                ) : (
-                  <Visibility fontSize="small" />
-                )}
+                {show ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
               </IconButton>
             </InputAdornment>
           ),

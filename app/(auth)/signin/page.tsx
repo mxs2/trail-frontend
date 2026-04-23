@@ -93,7 +93,10 @@ export default function SignInPage() {
           label="E-mail"
           type="email"
           value={email}
-          onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setEmailError('');
+          }}
           error={!!emailError}
           helperText={emailError}
           fullWidth
@@ -169,7 +172,11 @@ export default function SignInPage() {
         <Box
           component={Link}
           href="/signup"
-          sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+          sx={{
+            color: 'primary.main',
+            textDecoration: 'none',
+            '&:hover': { textDecoration: 'underline' },
+          }}
         >
           Criar conta
         </Box>

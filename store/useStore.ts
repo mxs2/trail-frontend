@@ -39,9 +39,7 @@ export const useStore = create<AppState>()(
             if (t.id !== trailId) return t;
             const modules = t.modules.map((m) => ({
               ...m,
-              lessons: m.lessons.map((l) =>
-                l.id !== lessonId ? l : { ...l, done: !l.done }
-              ),
+              lessons: m.lessons.map((l) => (l.id !== lessonId ? l : { ...l, done: !l.done })),
             }));
             const total = modules.reduce((a, m) => a + m.lessons.length, 0);
             const done = modules.reduce((a, m) => a + m.lessons.filter((l) => l.done).length, 0);

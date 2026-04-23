@@ -133,9 +133,7 @@ export default function LandingFeatures() {
               >
                 {title}
               </Typography>
-              <Typography
-                sx={{ fontSize: 14.5, color: tokens.text[2], lineHeight: 1.6 }}
-              >
+              <Typography sx={{ fontSize: 14.5, color: tokens.text[2], lineHeight: 1.6 }}>
                 {description}
               </Typography>
             </CardContent>

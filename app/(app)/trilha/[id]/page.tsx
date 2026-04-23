@@ -36,13 +36,7 @@ const TYPE_LABEL: Record<string, string> = {
   doc: 'Leitura',
 };
 
-function LessonRow({
-  lesson,
-  onToggle,
-}: {
-  lesson: Lesson;
-  onToggle: () => void;
-}) {
+function LessonRow({ lesson, onToggle }: { lesson: Lesson; onToggle: () => void }) {
   const router = useRouter();
   const locked = false;
   const status = lesson.done ? 'done' : lesson.current ? 'current' : 'todo';
@@ -123,7 +117,16 @@ function LessonRow({
             </Box>
           )}
         </Box>
-        <Box sx={{ display: 'flex', gap: 1.5, mt: 0.5, color: tokens.text[2], fontSize: 12, alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1.5,
+            mt: 0.5,
+            color: tokens.text[2],
+            fontSize: 12,
+            alignItems: 'center',
+          }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {TYPE_ICON[lesson.type]}
             <span>{TYPE_LABEL[lesson.type]}</span>
@@ -195,9 +198,7 @@ function ModuleCard({
           border: 'none',
           color: 'inherit',
           cursor: mod.locked ? 'default' : 'pointer',
-          '&:hover': !mod.locked
-            ? { bgcolor: 'rgba(255,255,255,0.03)' }
-            : {},
+          '&:hover': !mod.locked ? { bgcolor: 'rgba(255,255,255,0.03)' } : {},
         }}
       >
         {/* Module number badge */}
@@ -218,11 +219,7 @@ function ModuleCard({
             flexShrink: 0,
           }}
         >
-          {mod.locked ? (
-            <LockIcon sx={{ fontSize: 16 }} />
-          ) : (
-            String(idx + 1).padStart(2, '0')
-          )}
+          {mod.locked ? <LockIcon sx={{ fontSize: 16 }} /> : String(idx + 1).padStart(2, '0')}
         </Box>
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -285,19 +282,21 @@ function ModuleCard({
 
         {!mod.locked && (
           <Box sx={{ color: tokens.text[2], flexShrink: 0 }}>
-            {open ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+            {open ? (
+              <ExpandLessIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <ExpandMoreIcon sx={{ fontSize: 18 }} />
+            )}
           </Box>
         )}
       </Box>
 
       <Collapse in={open && !mod.locked}>
-        <Box sx={{ px: '22px', pb: '14px', borderTop: `1px solid ${tokens.line.default}`, pt: 0.5 }}>
+        <Box
+          sx={{ px: '22px', pb: '14px', borderTop: `1px solid ${tokens.line.default}`, pt: 0.5 }}
+        >
           {mod.lessons.map((l, li) => (
-            <LessonRow
-              key={l.id}
-              lesson={l}
-              onToggle={() => onToggle(li)}
-            />
+            <LessonRow key={l.id} lesson={l} onToggle={() => onToggle(li)} />
           ))}
         </Box>
       </Collapse>
@@ -319,9 +318,7 @@ export default function TrilhaPage() {
     if (lesson) toggleLesson(trail.id, lesson.id);
   };
 
-  const currentLesson = trail.modules
-    .flatMap((m) => m.lessons)
-    .find((l) => l.current);
+  const currentLesson = trail.modules.flatMap((m) => m.lessons).find((l) => l.current);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -380,9 +377,7 @@ export default function TrilhaPage() {
           <Button
             variant="contained"
             startIcon={<PlayArrowIcon />}
-            onClick={() =>
-              currentLesson && router.push(`/aula/${currentLesson.id}`)
-            }
+            onClick={() => currentLesson && router.push(`/aula/${currentLesson.id}`)}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           >
             Retomar trilha
@@ -420,9 +415,7 @@ export default function TrilhaPage() {
             Progresso
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75 }}>
-            <Typography
-              sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1 }}
-            >
+            <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1 }}>
               {trail.progress}
             </Typography>
             <Typography sx={{ color: tokens.text[2], fontSize: 14 }}>%</Typography>
@@ -467,9 +460,7 @@ export default function TrilhaPage() {
               / {trail.lessonsTotal}
             </Box>
           </Typography>
-          <Typography sx={{ fontSize: 12, color: tokens.text[2], mt: 1.5 }}>
-            concluídas
-          </Typography>
+          <Typography sx={{ fontSize: 12, color: tokens.text[2], mt: 1.5 }}>concluídas</Typography>
         </Box>
 
         {/* Tempo */}
@@ -529,9 +520,7 @@ export default function TrilhaPage() {
             <AutoAwesomeIcon sx={{ fontSize: 12 }} />
             <span>IA</span>
           </Box>
-          <Typography
-            sx={{ fontSize: 13, color: 'text.primary', lineHeight: 1.45 }}
-          >
+          <Typography sx={{ fontSize: 13, color: 'text.primary', lineHeight: 1.45 }}>
             {trail.aiNote}
           </Typography>
         </Box>
@@ -547,9 +536,7 @@ export default function TrilhaPage() {
             mb: 2,
           }}
         >
-          <Typography
-            sx={{ fontFamily: 'var(--f-serif)', fontSize: 22, whiteSpace: 'nowrap' }}
-          >
+          <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 22, whiteSpace: 'nowrap' }}>
             {trail.modules.length} módulos
           </Typography>
           <Box sx={{ flex: 1, height: '1px', bgcolor: tokens.line.default }} />
@@ -570,12 +557,7 @@ export default function TrilhaPage() {
         </Box>
 
         {trail.modules.map((m, i) => (
-          <ModuleCard
-            key={m.id}
-            mod={m}
-            idx={i}
-            onToggle={(li) => handleToggle(i, li)}
-          />
+          <ModuleCard key={m.id} mod={m} idx={i} onToggle={(li) => handleToggle(i, li)} />
         ))}
       </Box>
     </Box>
