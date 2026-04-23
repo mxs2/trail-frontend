@@ -1,3 +1,5 @@
+'use client';
+
 import Box from '@mui/material/Box';
 import Sidebar, { SIDEBAR_WIDTH } from './Sidebar';
 import Topbar from './Topbar';
