@@ -7,24 +7,27 @@ import Button from '@mui/material/Button';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined';
+import { useRouter } from 'next/navigation';
 import { useStore } from '../../../store/useStore';
-import { MOCK_TRAILS } from '../../../mocks/trails';
 import { WEEKLY_ACTIVITY } from '../../../mocks/activity';
 import { tokens } from '../../../lib/tokens';
 
 const MAX_MINS = Math.max(...WEEKLY_ACTIVITY.map((d) => d.mins));
 
 export default function DashboardPage() {
+  const router = useRouter();
   const user = useStore((s) => s.user);
+  const trails = useStore((s) => s.trails);
   const aiRecomendacao = useStore((s) => s.aiRecomendacao);
 
   const firstName = user?.name?.split(' ')[0] ?? 'Aluno';
-  const activeTrail = MOCK_TRAILS[0];
+  const activeTrail = trails[0];
   const today = new Date();
   const dateStr = today.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
   const aiTitle = aiRecomendacao?.trilhaPrincipal.title ?? 'Próximo passo sugerido';
-  const aiDesc = aiRecomendacao?.recomendacao.descricao ?? activeTrail.aiNote;
+  const aiDesc = aiRecomendacao?.recomendacao.descricao ?? activeTrail?.aiNote ?? '';
+  const aiTrailId = aiRecomendacao?.trilhaPrincipal.id ?? trails[1]?.id ?? activeTrail?.id;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -152,6 +155,7 @@ export default function DashboardPage() {
                 variant="contained"
                 size="small"
                 endIcon={<ArrowForwardIcon sx={{ fontSize: '12px !important' }} />}
+                onClick={() => activeTrail && router.push(`/trilha/${activeTrail.id}`)}
                 sx={{ borderRadius: '8px', fontSize: '0.8125rem' }}
               >
                 Continuar
@@ -190,6 +194,7 @@ export default function DashboardPage() {
             variant="outlined"
             fullWidth
             size="small"
+            onClick={() => aiTrailId && router.push(`/trilha/${aiTrailId}`)}
             sx={{
               mt: 2.5,
               borderRadius: '8px',
@@ -310,8 +315,12 @@ export default function DashboardPage() {
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
-            {MOCK_TRAILS.map((trail) => (
-              <Box key={trail.id} sx={{ display: 'flex', gap: 1.75, alignItems: 'center' }}>
+            {trails.map((trail) => (
+              <Box
+                key={trail.id}
+                onClick={() => router.push(`/trilha/${trail.id}`)}
+                sx={{ display: 'flex', gap: 1.75, alignItems: 'center', cursor: 'pointer' }}
+              >
                 <Box
                   sx={{
                     width: 36,

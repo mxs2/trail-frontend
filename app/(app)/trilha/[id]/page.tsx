@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useStore } from '../../../../store/useStore';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -21,7 +22,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { MOCK_TRAILS } from '../../../../mocks/trails';
 import { tokens } from '../../../../lib/tokens';
 import type { TrailModule, Lesson } from '../../../../types';
 
@@ -309,30 +309,13 @@ export default function TrilhaPage() {
   const router = useRouter();
   const id = params?.id as string;
 
-  const initial = MOCK_TRAILS.find((t) => t.id === id) ?? MOCK_TRAILS[0];
-  const [trail, setTrail] = useState(initial);
+  const trails = useStore((s) => s.trails);
+  const toggleLesson = useStore((s) => s.toggleLesson);
+  const trail = trails.find((t) => t.id === id) ?? trails[0];
 
   const handleToggle = (modIdx: number, lessonIdx: number) => {
-    setTrail((prev) => {
-      const modules = prev.modules.map((m, i) =>
-        i !== modIdx
-          ? m
-          : {
-              ...m,
-              lessons: m.lessons.map((l, j) =>
-                j !== lessonIdx ? l : { ...l, done: !l.done }
-              ),
-            }
-      );
-      const total = modules.reduce((a, m) => a + m.lessons.length, 0);
-      const done = modules.reduce((a, m) => a + m.lessons.filter((l) => l.done).length, 0);
-      return {
-        ...prev,
-        modules,
-        lessonsDone: done,
-        progress: Math.round((done / total) * 100),
-      };
-    });
+    const lesson = trail.modules[modIdx]?.lessons[lessonIdx];
+    if (lesson) toggleLesson(trail.id, lesson.id);
   };
 
   const currentLesson = trail.modules
