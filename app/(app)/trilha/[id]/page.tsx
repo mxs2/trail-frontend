@@ -193,6 +193,7 @@ function ModuleCard({
           textAlign: 'left',
           background: 'transparent',
           border: 'none',
+          color: 'inherit',
           cursor: mod.locked ? 'default' : 'pointer',
           '&:hover': !mod.locked
             ? { bgcolor: 'rgba(255,255,255,0.03)' }

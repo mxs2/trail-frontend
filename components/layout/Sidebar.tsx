@@ -101,7 +101,7 @@ function NavItem({ def, active, count }: NavItemProps) {
         alignItems: 'center',
         gap: 1.5,
         px: 1.5,
-        py: '9px',
+        py: '14px',
         borderRadius: 1,
         fontSize: 14,
         fontWeight: 500,
@@ -153,7 +153,7 @@ function SectionLabel({ children }: { children: string }) {
       component="div"
       sx={{
         px: 1.5,
-        pt: '14px',
+        pt: '6px',
         pb: '6px',
         textTransform: 'uppercase',
         letterSpacing: '0.1em',
@@ -205,21 +205,6 @@ export default function Sidebar() {
         }}
       >
         <Logo />
-        <Box
-          component="span"
-          sx={{
-            ml: 'auto',
-            fontFamily: 'var(--f-mono)',
-            fontSize: 10,
-            color: tokens.text[2],
-            px: '6px',
-            py: '2px',
-            border: `1px solid ${tokens.line.strong}`,
-            borderRadius: '4px',
-          }}
-        >
-          v0.9
-        </Box>
       </Box>
 
       {/* Scrollable nav area — grows to fill, scrolls when items overflow */}
@@ -230,32 +215,36 @@ export default function Sidebar() {
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px',
+          gap: '32px',
         }}
       >
         {/* Main navigation */}
         <nav>
           <SectionLabel>Navegação</SectionLabel>
-          {MAIN_NAV.map((def) => (
-            <NavItem
-              key={def.id}
-              def={def}
-              active={def.isActive(pathname)}
-              count={def.id === 'trilhas' && trails.length > 0 ? trails.length : undefined}
-            />
-          ))}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {MAIN_NAV.map((def) => (
+              <NavItem
+                key={def.id}
+                def={def}
+                active={def.isActive(pathname)}
+                count={def.id === 'trilhas' && trails.length > 0 ? trails.length : undefined}
+              />
+            ))}
+          </Box>
         </nav>
 
         {/* General navigation */}
         <nav aria-label="Geral">
           <SectionLabel>Geral</SectionLabel>
-          {GENERAL_NAV.map((def) => (
-            <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
-          ))}
-          {isMentor &&
-            MENTOR_NAV.map((def) => (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {GENERAL_NAV.map((def) => (
               <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
             ))}
+            {isMentor &&
+              MENTOR_NAV.map((def) => (
+                <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
+              ))}
+          </Box>
         </nav>
       </Box>
 
