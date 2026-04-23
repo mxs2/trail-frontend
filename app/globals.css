@@ -1,5 +1,9 @@
 /* Trail — global reset. Theme tokens live in lib/theme.ts. */
 
+:root {
+  --f-serif: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
