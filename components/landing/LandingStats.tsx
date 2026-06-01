@@ -110,6 +110,9 @@ export default function LandingStats() {
         </Box>
       </Box>
 
+      {/* Anchor for "Para mentores" nav link */}
+      <Box id="mentores" aria-hidden="true" sx={{ height: 0, overflow: 'hidden' }} />
+
       {/* Depoimento */}
       <Box
         component="section"

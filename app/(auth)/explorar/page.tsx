@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -8,18 +7,12 @@ import Button from '@mui/material/Button';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { useStore } from '../../../store/useStore';
 import Logo from '../../../components/ui/Logo';
 import { tokens } from '../../../lib/tokens';
 import { MOCK_TRAILS } from '../../../mocks/trails';
 
-export default function OnboardingPage() {
+export default function ExplorarPage() {
   const router = useRouter();
-  const user = useStore((s) => s.user);
-
-  useEffect(() => {
-    if (!user) router.replace('/signup');
-  }, [user, router]);
 
   return (
     <Box
@@ -38,24 +31,12 @@ export default function OnboardingPage() {
         }}
       >
         <Logo />
-        <Typography
-          variant="caption"
-          sx={{
-            ml: 1.5,
-            color: tokens.text[2],
-            fontFamily: 'var(--f-mono)',
-            letterSpacing: '0.08em',
-            fontSize: 12,
-          }}
-        >
-          ESCOLHA SUA TRILHA
-        </Typography>
         <Button
           variant="text"
-          onClick={() => router.push('/explorar')}
+          onClick={() => router.push('/dashboard')}
           sx={{ ml: 'auto', color: tokens.text[2], fontSize: '0.8125rem', textTransform: 'none' }}
         >
-          Depois →
+          Entrar no app →
         </Button>
       </Box>
 
@@ -80,13 +61,12 @@ export default function OnboardingPage() {
             mb: 1,
           }}
         >
-          Por onde você quer começar?
+          Trilhas disponíveis
         </Typography>
         <Typography sx={{ color: 'text.disabled', fontSize: '0.9375rem', mb: 5 }}>
-          Escolha uma trilha para iniciar agora. Você pode adicionar mais a qualquer momento.
+          Escolha uma trilha para começar. Você pode mudar ou adicionar mais a qualquer momento.
         </Typography>
 
-        {/* Trail cards */}
         <Box
           sx={{
             display: 'grid',

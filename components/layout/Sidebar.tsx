@@ -41,7 +41,7 @@ const MAIN_NAV: NavDef[] = [
   {
     id: 'trilhas',
     label: 'Minhas Trilhas',
-    href: '/trilha/react-fundamentals',
+    href: '/trilha',
     Icon: LayersOutlinedIcon,
     isActive: (p) => p.startsWith('/trilha'),
   },

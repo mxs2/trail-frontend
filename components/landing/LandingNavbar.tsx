@@ -8,11 +8,16 @@ import Typography from '@mui/material/Typography';
 import { tokens } from '../../lib/tokens';
 
 const NAV_LINKS = [
-  { label: 'Plataforma', href: '#plataforma' },
-  { label: 'Para mentores', href: '#mentores' },
-  { label: 'Como funciona', href: '#como-funciona' },
-  { label: 'Depoimentos', href: '#depoimentos' },
+  { label: 'Plataforma', targetId: 'plataforma' },
+  { label: 'Para mentores', targetId: 'mentores' },
+  { label: 'Como funciona', targetId: 'como-funciona' },
+  { label: 'Depoimentos', targetId: 'depoimentos' },
 ];
+
+function handleSmoothScroll(e: React.MouseEvent, targetId: string) {
+  e.preventDefault();
+  document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+}
 
 export default function LandingNavbar() {
   return (
@@ -53,15 +58,17 @@ export default function LandingNavbar() {
           listStyle: 'none',
         }}
       >
-        {NAV_LINKS.map(({ label, href }) => (
+        {NAV_LINKS.map(({ label, targetId }) => (
           <Box component="li" key={label}>
             <Typography
               component="a"
-              href={href}
+              href={`#${targetId}`}
+              onClick={(e) => handleSmoothScroll(e, targetId)}
               sx={{
                 fontSize: 14,
                 color: 'text.secondary',
                 textDecoration: 'none',
+                cursor: 'pointer',
                 transition: 'color 120ms',
                 '&:hover': { color: 'text.primary' },
               }}
