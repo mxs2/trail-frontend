@@ -68,9 +68,9 @@ describe('api service', () => {
     await expect(promise).resolves.toBeUndefined();
   });
 
-  it('getTrilhaPersonalizada resolves a personalized trail with a recommendation', async () => {
-    const promise = api.getTrilhaPersonalizada('u1');
+  it('getPersonalizedTrail resolves a personalized trail with a recommendation', async () => {
+    const promise = api.getPersonalizedTrail('u1');
     await jest.advanceTimersByTimeAsync(1200);
-    await expect(promise).resolves.toHaveProperty('recomendacao');
+    await expect(promise).resolves.toHaveProperty('recommendation');
   });
 });

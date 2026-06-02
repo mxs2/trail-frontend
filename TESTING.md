@@ -123,7 +123,7 @@ Setup inicial do E2E: `npx playwright install`.
 | TS07 | Favoritos | ✅ Automatizado | integração `favorites` (store + FavoriteButton) |
 | TS08 | Marcar aula concluída | ✅ Lógica | `useStore.toggleLesson` (unit) — recomputa progresso |
 | TS09 | Atualização do dashboard | ✅ Automatizado | integração `dashboardLoading` (dados + gráfico) |
-| TS10 | Recomendação personalizada (IA) | ⚠️ Parcial | `api.getTrilhaPersonalizada` (unit); UI da IA pendente |
+| TS10 | Recomendação personalizada (IA) | ⚠️ Parcial | `api.getPersonalizedTrail` (unit); UI da IA pendente |
 | TS11 | Chat IA | ⛔ Pendente | funcionalidade ainda não implementada |
 | TS12 | Responsividade | ✅ Automatizado | E2E `responsive` (640 / 768 / 1280) |
 

@@ -1,5 +1,6 @@
 'use client';
 
+import type { MouseEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Box from '@mui/material/Box';
@@ -15,6 +16,15 @@ const NAV_LINKS = [
 ];
 
 export default function LandingNavbar() {
+  const handleNavClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith('#')) return;
+    const target = document.querySelector(href);
+    if (!target) return;
+    event.preventDefault();
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+  };
+
   return (
     <Box
       component="nav"
@@ -58,6 +68,7 @@ export default function LandingNavbar() {
             <Typography
               component="a"
               href={href}
+              onClick={(event) => handleNavClick(event, href)}
               sx={{
                 fontSize: 14,
                 color: 'text.secondary',

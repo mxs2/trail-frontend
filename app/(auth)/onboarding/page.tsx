@@ -100,7 +100,7 @@ function cardSx(selected: boolean) {
 export default function OnboardingPage() {
   const router = useRouter();
   const user = useStore((s) => s.user);
-  const setAiRecomendacao = useStore((s) => s.setAiRecomendacao);
+  const setAiRecommendation = useStore((s) => s.setAiRecommendation);
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({
@@ -121,17 +121,17 @@ export default function OnboardingPage() {
     if (STEPS[step].id !== 'generating' || !user) return;
     let active = true;
     Promise.all([
-      api.getTrilhaPersonalizada(user.id),
+      api.getPersonalizedTrail(user.id),
       new Promise<void>((res) => setTimeout(res, 2000)),
     ]).then(([result]) => {
       if (!active) return;
-      setAiRecomendacao(result);
+      setAiRecommendation(result);
       router.push('/dashboard');
     });
     return () => {
       active = false;
     };
-  }, [step, user, setAiRecomendacao, router]);
+  }, [step, user, setAiRecommendation, router]);
 
   const s = STEPS[step];
   const totalQuestions = STEPS.length - 1; // 5 questions, generating doesn't count

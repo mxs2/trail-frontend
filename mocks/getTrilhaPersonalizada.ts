@@ -2,17 +2,17 @@
 // In production, replace the body with a real fetch to the AI endpoint.
 // Delay mimics model inference latency (800–1200ms).
 
-import type { TrilhaPersonalizada } from '../types';
+import type { PersonalizedTrail } from '../types';
 import { MOCK_TRAILS } from './trails';
 
-const PERSONALIZACAO: Record<string, TrilhaPersonalizada> = {
+const PERSONALIZACAO: Record<string, PersonalizedTrail> = {
   default: {
-    trilhaPrincipal: MOCK_TRAILS[0],
-    recomendacao: {
-      titulo: 'Uma revisão rápida antes de continuar',
-      descricao:
+    mainTrail: MOCK_TRAILS[0],
+    recommendation: {
+      title: 'Uma revisão rápida antes de continuar',
+      description:
         'Notei que você hesitou no exercício de useEffect. Separei um módulo de 12min que reforça dependency arrays antes da próxima aula.',
-      sugestoes: [
+      suggestions: [
         {
           id: 'sug-rf-dep-arrays',
           title: 'Revisão: Dependency arrays',
@@ -21,11 +21,11 @@ const PERSONALIZACAO: Record<string, TrilhaPersonalizada> = {
         },
       ],
     },
-    notaDoMentor: '',
+    mentorNote: '',
   },
 };
 
-export async function getTrilhaPersonalizada(userId: string): Promise<TrilhaPersonalizada> {
+export async function getPersonalizedTrail(userId: string): Promise<PersonalizedTrail> {
   await new Promise<void>((resolve) => setTimeout(resolve, 800 + Math.random() * 400));
   return PERSONALIZACAO[userId] ?? PERSONALIZACAO['default'];
 }

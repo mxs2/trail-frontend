@@ -4,9 +4,9 @@ export type {
   Lesson,
   TrailModule,
   Trail,
-  AiSugestao,
-  AiRecomendacao,
-  TrilhaPersonalizada,
+  AiSuggestion,
+  AiRecommendation,
+  PersonalizedTrail,
 } from './trail';
 
 export type { UserRole, User, WeeklyActivity } from './user';

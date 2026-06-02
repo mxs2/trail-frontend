@@ -85,7 +85,7 @@ e usados via `sx` nos componentes.
 
 | Rota                | Status       | Razão                                                                                                                                      |
 | ------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/trilha` (lista)   | **Removida** | Protótipo não entregou tela de lista. Menu "Minhas Trilhas" no sidebar aponta para `/dashboard`, que já exibe a lista de trilhas do aluno. |
+| `/trilha` (lista)   | **Ativa**    | Tela de lista restaurada; menu "Minhas Trilhas" no sidebar aponta para `/trilha`.                                                     |
 | `/trails`           | **Removida** | Nome anglicado substituído por `/trilha/[id]`                                                                                              |
 | `/dashboard/create` | **Removida** | Admin flow fora do escopo do MVP do aluno                                                                                                  |
 
@@ -96,11 +96,14 @@ e usados via `sx` nos componentes.
 /(auth)/signin             → Login
 /(auth)/signup             → Cadastro
 /(auth)/onboarding         → Onboarding pós-cadastro
+/(auth)/explorar           → Explorar (pré-login)
 /(app)/dashboard           → Home do aluno (inclui lista de trilhas)
+/(app)/trilha              → Lista de trilhas do aluno
 /(app)/trilha/[id]         → Detalhe da trilha + módulos
 /(app)/aula/[id]           → Player de aula
 /(app)/progresso           → Progresso geral
 /(app)/perfil              → Perfil do aluno
+/(app)/configuracoes       → Configurações
 /(app)/mentor              → Visão do mentor (baixa prioridade)
 ```
 

@@ -18,20 +18,21 @@ export default function DashboardPage() {
   const router = useRouter();
   const user = useStore((s) => s.user);
   const trails = useStore((s) => s.trails);
-  const aiRecomendacao = useStore((s) => s.aiRecomendacao);
+  const aiRecommendation = useStore((s) => s.aiRecommendation);
 
   const firstName = user?.name?.split(' ')[0] ?? 'Aluno';
   const activeTrail = trails[0];
   const today = new Date();
+  const todayIndex = (today.getDay() + 6) % 7;
   const dateStr = today.toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
   });
 
-  const aiTitle = aiRecomendacao?.trilhaPrincipal.title ?? 'Próximo passo sugerido';
-  const aiDesc = aiRecomendacao?.recomendacao.descricao ?? activeTrail?.aiNote ?? '';
-  const aiTrailId = aiRecomendacao?.trilhaPrincipal.id ?? trails[1]?.id ?? activeTrail?.id;
+  const aiTitle = aiRecommendation?.mainTrail.title ?? 'Próximo passo sugerido';
+  const aiDesc = aiRecommendation?.recommendation.description ?? activeTrail?.aiNote ?? '';
+  const aiTrailId = aiRecommendation?.mainTrail.id ?? trails[1]?.id ?? activeTrail?.id;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -267,9 +268,9 @@ export default function DashboardPage() {
             Minutos estudados por dia
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1.5, height: 80 }}>
-            {WEEKLY_ACTIVITY.map((d) => {
+            {WEEKLY_ACTIVITY.map((d, index) => {
               const pct = MAX_MINS > 0 ? (d.mins / MAX_MINS) * 100 : 0;
-              const isToday = d.day === 'Qui';
+              const isToday = index === todayIndex;
               return (
                 <Box
                   key={d.day}

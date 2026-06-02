@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User, Trail, Lesson, TrilhaPersonalizada } from '../types';
+import type { User, Trail, Lesson, PersonalizedTrail } from '../types';
 import { MOCK_TRAILS } from '../mocks/trails';
 
 interface AppState {
@@ -22,8 +22,8 @@ interface AppState {
   toggleFavorite: (trailId: string) => void;
   isFavorite: (trailId: string) => boolean;
   // AI personalization for the logged-in user
-  aiRecomendacao: TrilhaPersonalizada | null;
-  setAiRecomendacao: (rec: TrilhaPersonalizada | null) => void;
+  aiRecommendation: PersonalizedTrail | null;
+  setAiRecommendation: (rec: PersonalizedTrail | null) => void;
   // global loading flag
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
@@ -45,9 +45,10 @@ export const useStore = create<AppState>()(
               ...m,
               lessons: m.lessons.map((l) => (l.id !== lessonId ? l : { ...l, done: !l.done })),
             }));
-            const total = modules.reduce((a, m) => a + m.lessons.length, 0);
+            const totalFromModules = modules.reduce((a, m) => a + m.lessons.length, 0);
+            const total = t.lessonsTotal > 0 ? t.lessonsTotal : totalFromModules;
             const done = modules.reduce((a, m) => a + m.lessons.filter((l) => l.done).length, 0);
-            const progress = Math.round((done / total) * 100);
+            const progress = total > 0 ? Math.round((done / total) * 100) : 0;
             const hoursDone = Math.round((progress / 100) * t.hoursTotal * 10) / 10;
             return { ...t, modules, lessonsDone: done, progress, hoursDone };
           }),
@@ -68,8 +69,8 @@ export const useStore = create<AppState>()(
         })),
       isFavorite: (trailId) => get().favorites.includes(trailId),
 
-      aiRecomendacao: null,
-      setAiRecomendacao: (aiRecomendacao) => set({ aiRecomendacao }),
+      aiRecommendation: null,
+      setAiRecommendation: (aiRecommendation) => set({ aiRecommendation }),
 
       isLoading: false,
       setIsLoading: (isLoading) => set({ isLoading }),

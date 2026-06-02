@@ -47,22 +47,22 @@ export interface Trail {
   modules: TrailModule[];
 }
 
-export interface AiSugestao {
+export interface AiSuggestion {
   id: string;
   title: string;
   duration: string;
   type: LessonType;
 }
 
-export interface AiRecomendacao {
-  titulo: string;
-  descricao: string;
-  sugestoes: AiSugestao[];
+export interface AiRecommendation {
+  title: string;
+  description: string;
+  suggestions: AiSuggestion[];
 }
 
-export interface TrilhaPersonalizada {
-  trilhaPrincipal: Trail;
-  recomendacao: AiRecomendacao;
+export interface PersonalizedTrail {
+  mainTrail: Trail;
+  recommendation: AiRecommendation;
   /** Short note from the assigned mentor. Empty string when no mentor is assigned. */
-  notaDoMentor: string;
+  mentorNote: string;
 }

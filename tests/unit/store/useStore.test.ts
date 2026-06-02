@@ -46,14 +46,14 @@ describe('useStore', () => {
       store.setUser(userFixture);
       store.setCurrentTrail(trailFixture);
       store.setCurrentLesson(trailFixture.modules[0].lessons[0]);
-      store.setAiRecomendacao(null);
+      store.setAiRecommendation(null);
       store.setIsLoading(true);
 
       const state = useStore.getState();
       expect(state.user).toEqual(userFixture);
       expect(state.currentTrail).toEqual(trailFixture);
       expect(state.currentLesson?.id).toBe(trailFixture.modules[0].lessons[0].id);
-      expect(state.aiRecomendacao).toBeNull();
+      expect(state.aiRecommendation).toBeNull();
       expect(state.isLoading).toBe(true);
     });
 

@@ -16,7 +16,7 @@ export function resetStore(): void {
     currentTrail: null,
     currentLesson: null,
     favorites: [],
-    aiRecomendacao: null,
+    aiRecommendation: null,
     isLoading: false,
   });
   // Persisted slice ('trail-auth') would otherwise leak across tests.

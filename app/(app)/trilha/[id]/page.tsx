@@ -311,7 +311,32 @@ export default function TrilhaPage() {
 
   const trails = useStore((s) => s.trails);
   const toggleLesson = useStore((s) => s.toggleLesson);
-  const trail = trails.find((t) => t.id === id) ?? trails[0];
+  const trail = trails.find((t) => t.id === id);
+
+  if (!trail) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '60vh',
+          gap: 2,
+        }}
+      >
+        <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28 }}>
+          Trilha não encontrada
+        </Typography>
+        <Typography sx={{ color: tokens.text[2] }}>
+          O ID <code>{id}</code> não corresponde a nenhuma trilha.
+        </Typography>
+        <Button variant="contained" onClick={() => router.push('/dashboard')}>
+          Voltar ao dashboard
+        </Button>
+      </Box>
+    );
+  }
 
   const handleToggle = (modIdx: number, lessonIdx: number) => {
     const lesson = trail.modules[modIdx]?.lessons[lessonIdx];

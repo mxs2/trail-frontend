@@ -1,9 +1,9 @@
-import type { Trail, Lesson, TrilhaPersonalizada } from '../types';
+import type { Trail, Lesson, PersonalizedTrail } from '../types';
 import type { User, WeeklyActivity } from '../types';
 import { MOCK_TRAILS } from '../mocks/trails';
 import { MOCK_USER } from '../mocks/user';
 import { WEEKLY_ACTIVITY } from '../mocks/activity';
-import { getTrilhaPersonalizada as getTrilhaPersonalizadaMock } from '../mocks/getTrilhaPersonalizada';
+import { getPersonalizedTrail as getPersonalizedTrailMock } from '../mocks/getTrilhaPersonalizada';
 
 const delay = <T>(value: T, ms: number): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms));
@@ -49,8 +49,8 @@ export const api = {
     return delay([...WEEKLY_ACTIVITY], 300);
   },
 
-  async getTrilhaPersonalizada(userId: string): Promise<TrilhaPersonalizada> {
-    return getTrilhaPersonalizadaMock(userId);
+  async getPersonalizedTrail(userId: string): Promise<PersonalizedTrail> {
+    return getPersonalizedTrailMock(userId);
   },
 
   async login(_email: string, _password: string): Promise<User> {
