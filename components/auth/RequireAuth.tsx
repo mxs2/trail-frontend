@@ -16,11 +16,11 @@ import { useStore } from '../../store/useStore';
 export default function RequireAuth({ children }: { children: React.ReactNode }) {
   const user = useStore((s) => s.user);
   const router = useRouter();
-  const [hydrated, setHydrated] = useState(() => useStore.persist.hasHydrated());
+  const [hydrated, setHydrated] = useState(() => useStore.persist?.hasHydrated() ?? false);
 
   // Subscribe to rehydration completion (setState lives in the callback, not the
   // effect body) and unsubscribe on unmount.
-  useEffect(() => useStore.persist.onFinishHydration(() => setHydrated(true)), []);
+  useEffect(() => useStore.persist?.onFinishHydration(() => setHydrated(true)) ?? (() => {}), []);
 
   useEffect(() => {
     if (hydrated && !user) router.replace('/signin');
