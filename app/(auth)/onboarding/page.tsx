@@ -196,8 +196,8 @@ export default function OnboardingPage() {
     );
   }
 
-  // ── Step content ────────────────────────────────────────────────────────────
-  function StepContent() {
+  // ── Step content — plain helper (not a component) to avoid static-components lint error ──
+  function renderStep() {
     switch (step) {
       case 0:
         return (
@@ -371,7 +371,7 @@ export default function OnboardingPage() {
           </Typography>
 
           {/* Options */}
-          <StepContent />
+          {renderStep()}
 
           {/* Error */}
           {error && (

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useStore } from '../../../../store/useStore';
 import { api } from '../../../../services/api';
-import { parseGitHubUrl, isValidGitHubUrl, extractYouTubeId } from '../../../../lib/github';
+import { parseGitHubUrl, extractYouTubeId } from '../../../../lib/github';
 import type { Challenge } from '../../../../types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,10 +16,8 @@ import Chip from '@mui/material/Chip';
 import InputBase from '@mui/material/InputBase';
 import Alert from '@mui/material/Alert';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -133,7 +131,6 @@ function SubmitField({ challenge, onSubmitted }: SubmitFieldProps) {
   const valid = info.kind !== 'invalid';
 
   const isResubmit = challenge.lastSubmissionStatus === 'NeedsRevision';
-  const previousUrl = challenge.lastSubmissionAt ? url : null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
