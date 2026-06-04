@@ -14,7 +14,9 @@ describe('Password recovery flow', () => {
     await user.type(screen.getByLabelText(/e-mail/i), 'matheus.silva@trail.dev');
     await user.click(screen.getByRole('button', { name: 'Enviar link' }));
 
-    expect(await screen.findByRole('status')).toHaveTextContent(/link de redefinição já está a caminho/i);
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      /link de redefinição já está a caminho/i
+    );
     expect(mockedApi.requestPasswordReset).toHaveBeenCalledWith('matheus.silva@trail.dev');
   });
 

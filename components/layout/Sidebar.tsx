@@ -1,25 +1,43 @@
 'use client';
 
-// Icons: @mui/icons-material — already installed, avoids adding lucide-react dependency.
-
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Logo from '../ui/Logo';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
+import Tooltip from '@mui/material/Tooltip';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
+import Badge from '@mui/material/Badge';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useStore } from '../../store/useStore';
+import { api } from '../../services/api';
 import { tokens } from '../../lib/tokens';
 
 export const SIDEBAR_WIDTH = 248;
 
-// ─── Nav definitions ────────────────────────────────────────────────────────
+// ─── Role display helpers ────────────────────────────────────────────────────
+
+const ROLE_LABEL: Record<string, string> = {
+  admin: 'Administrador',
+  mentor: 'Mentor',
+  aluno: 'Aluno',
+};
+
+const ROLE_COLOR: Record<string, string> = {
+  admin: '#FF6200',
+  mentor: '#A78BFA',
+  aluno: '#5EEAD4',
+};
+
+// ─── Nav definitions ─────────────────────────────────────────────────────────
 
 interface NavDef {
   id: string;
@@ -35,7 +53,6 @@ const MAIN_NAV: NavDef[] = [
     label: 'Dashboard',
     href: '/dashboard',
     Icon: HomeOutlinedIcon,
-    // Active only on exact /dashboard; Minhas Trilhas handles /trilha/*
     isActive: (p) => p === '/dashboard',
   },
   {
@@ -73,15 +90,25 @@ const GENERAL_NAV: NavDef[] = [
 
 const MENTOR_NAV: NavDef[] = [
   {
-    id: 'mentor',
-    label: 'Mentor',
-    href: '/mentor',
+    id: 'mentor-queue',
+    label: 'Fila de Revisão',
+    href: '/mentor/queue',
     Icon: GroupOutlinedIcon,
     isActive: (p) => p.startsWith('/mentor'),
   },
 ];
 
-// ─── NavItem ────────────────────────────────────────────────────────────────
+const ADMIN_NAV: NavDef[] = [
+  {
+    id: 'admin-trails',
+    label: 'Gerenciar Trilhas',
+    href: '/admin/trails',
+    Icon: AdminPanelSettingsOutlinedIcon,
+    isActive: (p) => p.startsWith('/admin'),
+  },
+];
+
+// ─── NavItem ─────────────────────────────────────────────────────────────────
 
 interface NavItemProps {
   def: NavDef;
@@ -113,7 +140,6 @@ function NavItem({ def, active, count }: NavItemProps) {
         '&:hover': { bgcolor: tokens.bg[3], color: 'text.primary' },
       }}
     >
-      {/* Active left-edge indicator */}
       {active && (
         <Box
           aria-hidden="true"
@@ -144,8 +170,6 @@ function NavItem({ def, active, count }: NavItemProps) {
   );
 }
 
-// ─── Section label ───────────────────────────────────────────────────────────
-
 function SectionLabel({ children }: { children: string }) {
   return (
     <Typography
@@ -170,9 +194,36 @@ function SectionLabel({ children }: { children: string }) {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const user = useStore((s) => s.user);
+  const setUser = useStore((s) => s.setUser);
+  const setTrails = useStore((s) => s.setTrails);
   const trails = useStore((s) => s.trails);
   const isMentor = user?.role === 'mentor';
+  const isAdmin = user?.role === 'admin';
+  const isStudent = user?.role === 'aluno';
+  const roleColor = user ? (ROLE_COLOR[user.role] ?? tokens.text[2]) : tokens.text[2];
+
+  // Pending submissions badge — polled every 60s for mentor/admin
+  const [pendingCount, setPendingCount] = useState(0);
+  useEffect(() => {
+    if (!isMentor && !isAdmin) return;
+    const load = () =>
+      api
+        .getPendingCount()
+        .then(setPendingCount)
+        .catch(() => {});
+    load();
+    const id = setInterval(load, 60_000);
+    return () => clearInterval(id);
+  }, [isMentor, isAdmin]);
+
+  async function handleLogout() {
+    await api.logout();
+    setUser(null);
+    setTrails([]);
+    router.push('/signin');
+  }
 
   return (
     <Box
@@ -207,7 +258,7 @@ export default function Sidebar() {
         <Logo />
       </Box>
 
-      {/* Scrollable nav area — grows to fill, scrolls when items overflow */}
+      {/* Scrollable nav */}
       <Box
         sx={{
           flex: 1,
@@ -215,89 +266,177 @@ export default function Sidebar() {
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: '32px',
+          gap: '28px',
         }}
       >
-        {/* Main navigation */}
-        <nav>
-          <SectionLabel>Navegação</SectionLabel>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {MAIN_NAV.map((def) => (
-              <NavItem
-                key={def.id}
-                def={def}
-                active={def.isActive(pathname)}
-                count={def.id === 'trilhas' && trails.length > 0 ? trails.length : undefined}
-              />
-            ))}
-          </Box>
-        </nav>
+        {isStudent ? (
+          // ── Student layout: two labelled sections ─────────────────────────
+          <>
+            <nav>
+              <SectionLabel>Navegação</SectionLabel>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {MAIN_NAV.map((def) => (
+                  <NavItem
+                    key={def.id}
+                    def={def}
+                    active={def.isActive(pathname)}
+                    count={def.id === 'trilhas' && trails.length > 0 ? trails.length : undefined}
+                  />
+                ))}
+              </Box>
+            </nav>
 
-        {/* General navigation */}
-        <nav aria-label="Geral">
-          <SectionLabel>Geral</SectionLabel>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {GENERAL_NAV.map((def) => (
-              <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
-            ))}
-            {isMentor &&
-              MENTOR_NAV.map((def) => (
-                <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
-              ))}
-          </Box>
-        </nav>
+            <nav aria-label="Geral">
+              <SectionLabel>Geral</SectionLabel>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {GENERAL_NAV.map((def) => (
+                  <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
+                ))}
+              </Box>
+            </nav>
+          </>
+        ) : (
+          // ── Admin / Mentor layout: Dashboard at top, then one flat section ─
+          <>
+            <nav>
+              {/* Dashboard sits alone at the top — no section label needed */}
+              <NavItem def={MAIN_NAV[0]} active={MAIN_NAV[0].isActive(pathname)} />
+            </nav>
+
+            <nav aria-label="Geral">
+              <SectionLabel>Geral</SectionLabel>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {GENERAL_NAV.map((def) => (
+                  <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
+                ))}
+                {isMentor &&
+                  MENTOR_NAV.map((def) => (
+                    <NavItem
+                      key={def.id}
+                      def={def}
+                      active={def.isActive(pathname)}
+                      count={
+                        def.id === 'mentor-queue' && pendingCount > 0 ? pendingCount : undefined
+                      }
+                    />
+                  ))}
+              </Box>
+            </nav>
+
+            {isAdmin && (
+              <nav aria-label="Admin">
+                <SectionLabel>Admin</SectionLabel>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {ADMIN_NAV.map((def) => (
+                    <NavItem key={def.id} def={def} active={def.isActive(pathname)} />
+                  ))}
+                </Box>
+              </nav>
+            )}
+          </>
+        )}
       </Box>
 
-      {/* Profile footer — always visible, never compressed */}
+      {/* Profile footer */}
       <Box sx={{ flexShrink: 0 }}>
         {user ? (
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.25,
               p: 1.25,
               borderRadius: '12px',
               border: `1px solid ${tokens.line.default}`,
               bgcolor: 'background.paper',
             }}
           >
-            <Box
-              aria-hidden="true"
-              sx={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #FF6200 0%, #E55A00 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontWeight: 600,
-                fontSize: 13,
-                flexShrink: 0,
-              }}
-            >
-              {user.avatarInitials}
-            </Box>
-            <Box sx={{ minWidth: 0, flex: 1 }}>
-              <Typography
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+              {/* Avatar with role-colour ring */}
+              <Box
+                aria-hidden="true"
                 sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: `linear-gradient(135deg, ${roleColor} 0%, ${roleColor}cc 100%)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontWeight: 700,
                   fontSize: 13,
-                  fontWeight: 600,
-                  color: 'text.primary',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
-                {user.name}
-              </Typography>
-              <Typography sx={{ fontSize: 11, color: 'text.disabled' }}>
-                {user.role === 'aluno' ? `Aluno · Nível ${user.level}` : user.role}
-              </Typography>
+                {user.avatarInitials}
+              </Box>
+
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: 'text.primary',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {user.name}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {/* Role pill */}
+                  <Box
+                    sx={{
+                      px: '5px',
+                      py: '1px',
+                      borderRadius: '4px',
+                      bgcolor: `${roleColor}22`,
+                      border: `1px solid ${roleColor}55`,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: 10,
+                        color: roleColor,
+                        fontFamily: 'var(--f-mono)',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      {ROLE_LABEL[user.role] ?? user.role}
+                    </Typography>
+                  </Box>
+                  {user.role === 'aluno' && (
+                    <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>
+                      Nível {user.level}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+
+              <Tooltip title="Sair" placement="top">
+                <Box
+                  component="button"
+                  onClick={handleLogout}
+                  aria-label="Sair da conta"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 28,
+                    height: 28,
+                    borderRadius: '6px',
+                    border: 'none',
+                    bgcolor: 'transparent',
+                    color: tokens.text[3],
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'color 120ms, background 120ms',
+                    '&:hover': { bgcolor: tokens.bg[4], color: 'text.primary' },
+                  }}
+                >
+                  <LogoutOutlinedIcon sx={{ fontSize: 15 }} />
+                </Box>
+              </Tooltip>
             </Box>
-            {/* TODO: logout button */}
           </Box>
         ) : (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, p: 1.25 }}>

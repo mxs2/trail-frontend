@@ -18,6 +18,7 @@ TypeScript 5 (strict), ESLint 9 (flat config), **MUI v9 + Emotion** (não Tailwi
 **Zustand** (persistido) para estado. Alias de path `@/* → ./*`.
 
 ### O que já existia
+
 - UI de protótipo funcional: landing, login, cadastro, onboarding, dashboard,
   progresso, páginas de trilha e de aula.
 - Uma **camada de dados mock**: [`services/api.ts`](services/api.ts) é um objeto
@@ -27,17 +28,19 @@ TypeScript 5 (strict), ESLint 9 (flat config), **MUI v9 + Emotion** (não Tailwi
 - Tipos de domínio em [`types/`](types/) e dados mock em [`mocks/`](mocks/).
 
 ### Infraestrutura de testes ausente
+
 - **Nenhum runner, nenhum teste, nenhuma cobertura, nenhum E2E** — o `package.json`
   só tinha `dev/build/start/lint`.
 - `hooks/index.ts` e `utils/index.ts` eram **arquivos placeholder vazios**.
 
 ### Riscos arquiteturais identificados
+
 - **Sem camada HTTP** → o MSW (que intercepta tráfego de rede) não tem o que
   interceptar hoje. Mitigado mockando o módulo `services/api` (a fronteira real)
   e mantendo o MSW como infraestrutura pronta para o futuro (ver §6).
 - **Vários fluxos dos critérios de aceite não estavam implementados**: recuperação
   de senha (apenas link decorativo), favoritos (ausentes do store), busca real (a
-  busca da Topbar era explicitamente *"decorative, no logic yet"*), e nenhuma
+  busca da Topbar era explicitamente _"decorative, no logic yet"_), e nenhuma
   proteção de rota (usuários deslogados conseguiam abrir `/dashboard`).
 - Os dados mock são internamente inconsistentes (ex.: o `lessonsDone` estático de
   uma trilha difere da contagem de aulas `done` em seus `modules`). Por isso os
@@ -53,15 +56,15 @@ foram adicionados trechos pequenos, aditivos e prontos para produção — os
 placeholders vazios foram preenchidos e a UI existente foi preservada (apenas o
 link "Esqueci minha senha" do login virou um link real).
 
-| Arquivo | Por quê | Cenário |
-|---------|---------|---------|
-| [`utils/index.ts`](utils/index.ts) | `getInitials`, `clampProgress`, `filterTrails` — helpers puros (a lógica de busca vive aqui) | TS06 |
-| [`hooks/index.ts`](hooks/index.ts) | `useDebouncedValue` — o exemplo de hook customizado | TS06 |
-| [`components/ui/ProgressCard.tsx`](components/ui/ProgressCard.tsx) | Card de progresso reutilizável e acessível (padrão duplicado no dashboard/progresso) | TS09 |
-| [`components/ui/FavoriteButton.tsx`](components/ui/FavoriteButton.tsx) | Fluxo de favoritos; `aria-pressed` + rótulo dinâmico | TS07 |
-| [`components/auth/RequireAuth.tsx`](components/auth/RequireAuth.tsx) | Guard de rota no client → torna "rotas protegidas" um teste real | — |
-| [`app/(auth)/recuperar-senha/page.tsx`](app/(auth)/recuperar-senha/page.tsx) | Página mínima de recuperação de senha (reusa o `AuthShell`) | TS04 |
-| `store` / `services/api` | `favorites` + `toggleFavorite`/`isFavorite` e `api.requestPasswordReset` (aditivo) | TS07 / TS04 |
+| Arquivo                                                                        | Por quê                                                                                      | Cenário     |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | ----------- |
+| [`utils/index.ts`](utils/index.ts)                                             | `getInitials`, `clampProgress`, `filterTrails` — helpers puros (a lógica de busca vive aqui) | TS06        |
+| [`hooks/index.ts`](hooks/index.ts)                                             | `useDebouncedValue` — o exemplo de hook customizado                                          | TS06        |
+| [`components/ui/ProgressCard.tsx`](components/ui/ProgressCard.tsx)             | Card de progresso reutilizável e acessível (padrão duplicado no dashboard/progresso)         | TS09        |
+| [`components/ui/FavoriteButton.tsx`](components/ui/FavoriteButton.tsx)         | Fluxo de favoritos; `aria-pressed` + rótulo dinâmico                                         | TS07        |
+| [`components/auth/RequireAuth.tsx`](components/auth/RequireAuth.tsx)           | Guard de rota no client → torna "rotas protegidas" um teste real                             | —           |
+| [`app/(auth)/recuperar-senha/page.tsx`](<app/(auth)/recuperar-senha/page.tsx>) | Página mínima de recuperação de senha (reusa o `AuthShell`)                                  | TS04        |
+| `store` / `services/api`                                                       | `favorites` + `toggleFavorite`/`isFavorite` e `api.requestPasswordReset` (aditivo)           | TS07 / TS04 |
 
 ---
 
@@ -112,20 +115,20 @@ Setup inicial do E2E: `npx playwright install`.
 
 ## 5. Cobertura dos cenários do Plano de Testes (TS01–TS12)
 
-| ID | Cenário | Status | Onde |
-|----|---------|--------|------|
-| TS01 | Cadastro de usuário | ⚠️ Parcial | UI existe; teste de cadastro pode ser adicionado (mesmo padrão do login) |
-| TS02 | Login com credenciais válidas | ✅ Automatizado | integração `login` + E2E `authentication` |
-| TS03 | Bloqueio após 5 tentativas | ⛔ Pendente | regra de bloqueio ainda não implementada (ver §9) |
-| TS04 | Recuperação de senha | ✅ Automatizado | integração `passwordRecovery` + E2E `authentication` |
-| TS05 | Edição de perfil | ⛔ Pendente | funcionalidade ainda não implementada |
-| TS06 | Pesquisa de trilhas | ✅ Lógica / ⚠️ UI | `utils.filterTrails` + `useDebouncedValue` (unit); UI ⌘K em `fixme` no E2E |
-| TS07 | Favoritos | ✅ Automatizado | integração `favorites` (store + FavoriteButton) |
-| TS08 | Marcar aula concluída | ✅ Lógica | `useStore.toggleLesson` (unit) — recomputa progresso |
-| TS09 | Atualização do dashboard | ✅ Automatizado | integração `dashboardLoading` (dados + gráfico) |
-| TS10 | Recomendação personalizada (IA) | ⚠️ Parcial | `api.getTrilhaPersonalizada` (unit); UI da IA pendente |
-| TS11 | Chat IA | ⛔ Pendente | funcionalidade ainda não implementada |
-| TS12 | Responsividade | ✅ Automatizado | E2E `responsive` (640 / 768 / 1280) |
+| ID   | Cenário                         | Status            | Onde                                                                       |
+| ---- | ------------------------------- | ----------------- | -------------------------------------------------------------------------- |
+| TS01 | Cadastro de usuário             | ⚠️ Parcial        | UI existe; teste de cadastro pode ser adicionado (mesmo padrão do login)   |
+| TS02 | Login com credenciais válidas   | ✅ Automatizado   | integração `login` + E2E `authentication`                                  |
+| TS03 | Bloqueio após 5 tentativas      | ⛔ Pendente       | regra de bloqueio ainda não implementada (ver §9)                          |
+| TS04 | Recuperação de senha            | ✅ Automatizado   | integração `passwordRecovery` + E2E `authentication`                       |
+| TS05 | Edição de perfil                | ⛔ Pendente       | funcionalidade ainda não implementada                                      |
+| TS06 | Pesquisa de trilhas             | ✅ Lógica / ⚠️ UI | `utils.filterTrails` + `useDebouncedValue` (unit); UI ⌘K em `fixme` no E2E |
+| TS07 | Favoritos                       | ✅ Automatizado   | integração `favorites` (store + FavoriteButton)                            |
+| TS08 | Marcar aula concluída           | ✅ Lógica         | `useStore.toggleLesson` (unit) — recomputa progresso                       |
+| TS09 | Atualização do dashboard        | ✅ Automatizado   | integração `dashboardLoading` (dados + gráfico)                            |
+| TS10 | Recomendação personalizada (IA) | ⚠️ Parcial        | `api.getTrilhaPersonalizada` (unit); UI da IA pendente                     |
+| TS11 | Chat IA                         | ⛔ Pendente       | funcionalidade ainda não implementada                                      |
+| TS12 | Responsividade                  | ✅ Automatizado   | E2E `responsive` (640 / 768 / 1280)                                        |
 
 Legenda: ✅ automatizado · ⚠️ parcial · ⛔ pendente de implementação do produto.
 
