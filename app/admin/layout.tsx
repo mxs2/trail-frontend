@@ -1,13 +1,13 @@
 import AppShell from '../../components/layout/AppShell';
-import RequireAuth from '../../components/auth/RequireAuth';
+import RequireRole from '../../components/auth/RequireRole';
 import { ErrorBoundary } from '../../components/error/ErrorBoundary';
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RequireAuth>
+    <RequireRole role="admin">
       <AppShell>
         <ErrorBoundary>{children}</ErrorBoundary>
       </AppShell>
-    </RequireAuth>
+    </RequireRole>
   );
 }

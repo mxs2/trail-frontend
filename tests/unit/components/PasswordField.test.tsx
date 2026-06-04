@@ -4,7 +4,11 @@ import { renderWithProviders } from '../../utils/renderWithProviders';
 
 function Harness(props: { value?: string; onChange?: (v: string) => void }) {
   return (
-    <PasswordField label="Senha" value={props.value ?? ''} onChange={props.onChange ?? (() => {})} />
+    <PasswordField
+      label="Senha"
+      value={props.value ?? ''}
+      onChange={props.onChange ?? (() => {})}
+    />
   );
 }
 

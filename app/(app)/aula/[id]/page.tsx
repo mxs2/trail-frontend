@@ -107,7 +107,9 @@ export default function AulaPage() {
   const lessonId = params?.id as string;
 
   const trails = useStore((s) => s.trails);
-  const toggleLesson = useStore((s) => s.toggleLesson);
+  // toggleLesson was removed — lessons are now tracked via Challenge submissions.
+  // This page is a legacy stub; the toggle is a no-op until the lesson feature is rebuilt.
+  const toggleLesson = (_trailId: string, _lessonId: string) => {};
 
   const found = findLesson(trails, lessonId);
 

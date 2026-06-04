@@ -1,192 +1,298 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
 import { useStore } from '../../../../store/useStore';
+import { api } from '../../../../services/api';
+import { parseGitHubUrl, isValidGitHubUrl, extractYouTubeId } from '../../../../lib/github';
+import type { Challenge } from '../../../../types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
+import CircularProgress from '@mui/material/CircularProgress';
+import Chip from '@mui/material/Chip';
+import InputBase from '@mui/material/InputBase';
+import Alert from '@mui/material/Alert';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import LockIcon from '@mui/icons-material/Lock';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined';
-import CodeIcon from '@mui/icons-material/Code';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import LinkIcon from '@mui/icons-material/Link';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { tokens } from '../../../../lib/tokens';
-import type { TrailModule, Lesson } from '../../../../types';
+import { SocraticChat } from '../../../../components/ai/SocraticChat';
 
-const TYPE_ICON: Record<string, React.ReactNode> = {
-  video: <PlayCircleOutlineIcon sx={{ fontSize: 13 }} />,
-  code: <CodeIcon sx={{ fontSize: 13 }} />,
-  doc: <DescriptionOutlinedIcon sx={{ fontSize: 13 }} />,
-};
-const TYPE_LABEL: Record<string, string> = {
-  video: 'Vídeo',
-  code: 'Exercício',
-  doc: 'Leitura',
-};
+// ── Status helpers ────────────────────────────────────────────────────────────
 
-function LessonRow({ lesson, onToggle }: { lesson: Lesson; onToggle: () => void }) {
-  const router = useRouter();
-  const locked = false;
-  const status = lesson.done ? 'done' : lesson.current ? 'current' : 'todo';
+type SubmissionStatus = 'Submitted' | 'Approved' | 'NeedsRevision';
 
-  const handleOpen = () => {
-    router.push(`/aula/${lesson.id}`);
-  };
+function statusConfig(s: SubmissionStatus | null) {
+  switch (s) {
+    case 'Approved':
+      return {
+        label: 'Aprovado',
+        color: 'primary.main',
+        bg: tokens.orange.soft,
+        ring: tokens.orange.ring,
+        Icon: CheckCircleIcon,
+      };
+    case 'NeedsRevision':
+      return {
+        label: 'Revisão necessária',
+        color: 'error.main',
+        bg: 'rgba(248,113,113,0.12)',
+        ring: 'rgba(248,113,113,0.35)',
+        Icon: RefreshIcon,
+      };
+    case 'Submitted':
+      return {
+        label: 'Aguardando revisão',
+        color: tokens.violet.main,
+        bg: tokens.violet.soft,
+        ring: tokens.violet.ring,
+        Icon: RadioButtonUncheckedIcon,
+      };
+    default:
+      return {
+        label: 'Pendente',
+        color: tokens.text[2],
+        bg: 'transparent',
+        ring: tokens.line.default,
+        Icon: RadioButtonUncheckedIcon,
+      };
+  }
+}
+
+// ── YouTube embed ─────────────────────────────────────────────────────────────
+
+function YouTubeEmbed({ url }: { url: string }) {
+  const [open, setOpen] = useState(false);
+  const id = extractYouTubeId(url);
+  if (!id) return null;
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        py: 1.75,
-        borderBottom: `1px solid ${tokens.line.default}`,
-        opacity: locked ? 0.45 : 1,
-        '&:last-child': { borderBottom: 'none' },
-      }}
-    >
-      <Box
-        component="button"
-        onClick={onToggle}
+    <Box>
+      <Button
+        size="small"
+        startIcon={<PlayCircleIcon sx={{ fontSize: '15px !important', color: '#FF0000' }} />}
+        onClick={() => setOpen((v) => !v)}
         sx={{
-          width: 22,
-          height: 22,
-          border: 'none',
-          background: 'transparent',
-          p: 0,
-          cursor: 'pointer',
-          color: lesson.done ? 'primary.main' : tokens.text[2],
-          flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          textTransform: 'none',
+          color: tokens.text[2],
+          fontSize: '0.8125rem',
+          pl: 0,
+          '&:hover': { color: 'text.primary' },
         }}
       >
-        {lesson.done ? (
-          <CheckCircleIcon sx={{ fontSize: 20, color: 'primary.main' }} />
-        ) : (
-          <RadioButtonUncheckedIcon sx={{ fontSize: 20 }} />
-        )}
-      </Box>
-
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: status === 'current' ? 600 : 500,
-              color: lesson.done ? tokens.text[2] : 'text.primary',
-              textDecoration: lesson.done ? 'line-through' : 'none',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {lesson.title}
-          </Typography>
-          {lesson.current && (
-            <Box
-              sx={{
-                px: 1,
-                py: 0.25,
-                borderRadius: '20px',
-                bgcolor: tokens.orange.soft,
-                border: `1px solid ${tokens.orange.ring}`,
-                fontSize: 10,
-                fontWeight: 600,
-                color: 'primary.main',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-              }}
-            >
-              Atual
-            </Box>
-          )}
-        </Box>
+        {open ? 'Fechar tutorial' : 'Assistir tutorial'}
+      </Button>
+      <Collapse in={open}>
         <Box
           sx={{
-            display: 'flex',
-            gap: 1.5,
-            mt: 0.5,
-            color: tokens.text[2],
-            fontSize: 12,
-            alignItems: 'center',
+            mt: 1.5,
+            borderRadius: '10px',
+            overflow: 'hidden',
+            aspectRatio: '16/9',
+            bgcolor: '#000',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            {TYPE_ICON[lesson.type]}
-            <span>{TYPE_LABEL[lesson.type]}</span>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <AccessTimeIcon sx={{ fontSize: 13 }} />
-            <span>{lesson.duration}</span>
-          </Box>
+          <iframe
+            src={`https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`}
+            style={{ width: '100%', height: '100%', border: 'none' }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="Tutorial"
+          />
         </Box>
-      </Box>
-
-      <Button
-        onClick={handleOpen}
-        size="small"
-        variant="text"
-        endIcon={<ArrowForwardIosIcon sx={{ fontSize: '10px !important' }} />}
-        sx={{
-          fontSize: 12,
-          color: tokens.text[2],
-          textTransform: 'none',
-          px: 1.5,
-          py: 0.5,
-          flexShrink: 0,
-          '&:hover': { color: 'text.primary', bgcolor: tokens.bg[4] },
-        }}
-      >
-        {lesson.current ? 'Retomar' : lesson.done ? 'Revisar' : 'Abrir'}
-      </Button>
+      </Collapse>
     </Box>
   );
 }
 
-function ModuleCard({
-  mod,
-  idx,
-  onToggle,
-}: {
-  mod: TrailModule;
-  idx: number;
-  onToggle: (lessonIdx: number) => void;
-}) {
-  const total = mod.lessons.length;
-  const done = mod.lessons.filter((l) => l.done).length;
-  const pct = Math.round((done / total) * 100);
-  const [open, setOpen] = useState(mod.current || idx === 0);
+// ── Inline submission field ───────────────────────────────────────────────────
+
+interface SubmitFieldProps {
+  challenge: Challenge;
+  onSubmitted: (updated: Challenge) => void;
+}
+
+function SubmitField({ challenge, onSubmitted }: SubmitFieldProps) {
+  const [url, setUrl] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const info = parseGitHubUrl(url);
+  const valid = info.kind !== 'invalid';
+
+  const isResubmit = challenge.lastSubmissionStatus === 'NeedsRevision';
+  const previousUrl = challenge.lastSubmissionAt ? url : null;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = url.trim();
+
+    // Guard: empty field
+    if (!trimmed) {
+      setError('Cole o link do seu repositório ou Gist para entregar.');
+      return;
+    }
+
+    // Guard: invalid GitHub URL pattern
+    if (!valid) {
+      setError(
+        'Link inválido. Use o formato github.com/usuário/repositório ou gist.github.com/usuário/id.'
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    setError('');
+    try {
+      await api.createSubmission({ challengeId: challenge.id, gitHubUrl: trimmed });
+      onSubmitted({
+        ...challenge,
+        lastSubmissionAt: new Date().toISOString(),
+        lastSubmissionStatus: 'Submitted',
+      });
+      setUrl('');
+    } catch (err: unknown) {
+      // Surface user-friendly message; swallow raw backend validation noise
+      const msg = err instanceof Error ? err.message : '';
+      setError(
+        msg && !msg.toLowerCase().includes('validation')
+          ? msg
+          : 'Não foi possível enviar. Verifique o link e tente novamente.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+    >
+      {error && (
+        <Alert severity="error" sx={{ borderRadius: '8px', py: 0, fontSize: '0.8125rem' }}>
+          {error}
+        </Alert>
+      )}
+
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: 1.5,
+          py: 1,
+          borderRadius: '10px',
+          bgcolor: tokens.bg[0],
+          border: `1px solid ${url && valid ? tokens.orange.ring : url ? 'rgba(248,113,113,0.4)' : tokens.line.strong}`,
+          transition: 'border-color 150ms',
+          '&:focus-within': { borderColor: valid ? tokens.orange.ring : 'rgba(248,113,113,0.4)' },
+        }}
+      >
+        <LinkIcon sx={{ fontSize: 16, color: tokens.text[2], flexShrink: 0 }} />
+        <InputBase
+          value={url}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            setError('');
+          }}
+          placeholder={
+            isResubmit
+              ? 'Cole o link corrigido (github.com/…)'
+              : 'https://github.com/usuário/repositório'
+          }
+          sx={{
+            flex: 1,
+            fontSize: '0.875rem',
+            color: 'text.primary',
+            '& input::placeholder': { color: tokens.text[2] },
+          }}
+        />
+        {/* Real-time type badge */}
+        {url && (
+          <Chip
+            label={valid ? (info.kind === 'gist' ? 'gist' : 'repo') : 'URL inválida'}
+            size="small"
+            sx={{
+              height: 20,
+              fontSize: '0.6875rem',
+              fontFamily: 'var(--f-mono)',
+              bgcolor: valid ? tokens.orange.soft : 'rgba(248,113,113,0.12)',
+              color: valid ? 'primary.main' : 'error.main',
+              border: `1px solid ${valid ? tokens.orange.ring : 'rgba(248,113,113,0.4)'}`,
+              flexShrink: 0,
+            }}
+          />
+        )}
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          type="submit"
+          variant="contained"
+          size="small"
+          disabled={submitting || !valid}
+          startIcon={
+            isResubmit ? (
+              <RefreshIcon sx={{ fontSize: '14px !important' }} />
+            ) : (
+              <AssignmentOutlinedIcon sx={{ fontSize: '14px !important' }} />
+            )
+          }
+          sx={{ textTransform: 'none', borderRadius: '8px', px: 2 }}
+        >
+          {submitting ? 'Enviando…' : isResubmit ? 'Reenviar' : 'Entregar'}
+        </Button>
+      </Box>
+    </Box>
+  );
+}
+
+// ── Challenge card ─────────────────────────────────────────────────────────────
+
+interface ChallengeCardProps {
+  challenge: Challenge;
+  index: number;
+  isStudent: boolean;
+  onSubmitted: (updated: Challenge) => void;
+}
+
+function ChallengeCard({ challenge, index, isStudent, onSubmitted }: ChallengeCardProps) {
+  const status = challenge.lastSubmissionStatus;
+  const cfg = statusConfig(status);
+  const [open, setOpen] = useState(index === 0);
+
+  const needsRevision = status === 'NeedsRevision';
+  const approved = status === 'Approved';
+  const submitted = status === 'Submitted';
 
   return (
     <Box
       sx={{
         bgcolor: tokens.bg[3],
-        border: `1px solid ${tokens.line.default}`,
+        border: `1px solid ${approved ? tokens.orange.ring : needsRevision ? 'rgba(248,113,113,0.4)' : submitted ? tokens.violet.ring : tokens.line.default}`,
         borderRadius: '14px',
         mb: 1.5,
         overflow: 'hidden',
-        opacity: mod.locked ? 0.65 : 1,
       }}
     >
+      {/* Clickable header row */}
       <Box
         component="button"
-        onClick={() => !mod.locked && setOpen(!open)}
+        onClick={() => setOpen((v) => !v)}
         sx={{
           width: '100%',
           p: '18px 22px',
@@ -197,132 +303,239 @@ function ModuleCard({
           background: 'transparent',
           border: 'none',
           color: 'inherit',
-          cursor: mod.locked ? 'default' : 'pointer',
-          '&:hover': !mod.locked ? { bgcolor: 'rgba(255,255,255,0.03)' } : {},
+          cursor: 'pointer',
+          '&:hover': { bgcolor: 'rgba(255,255,255,0.025)' },
         }}
       >
-        {/* Module number badge */}
+        {/* Status icon */}
+        <Box sx={{ flexShrink: 0, color: approved ? 'primary.main' : cfg.color }}>
+          {approved ? (
+            <CheckCircleIcon sx={{ fontSize: 22, color: 'primary.main' }} />
+          ) : needsRevision ? (
+            <RefreshIcon sx={{ fontSize: 22, color: 'error.main' }} />
+          ) : submitted ? (
+            <RadioButtonUncheckedIcon sx={{ fontSize: 22, color: tokens.violet.main }} />
+          ) : (
+            <RadioButtonUncheckedIcon sx={{ fontSize: 22, color: tokens.text[2] }} />
+          )}
+        </Box>
+
+        {/* Order badge */}
         <Box
           sx={{
-            width: 42,
-            height: 42,
-            borderRadius: '10px',
-            bgcolor: mod.current ? tokens.orange.soft : tokens.bg[0],
-            color: mod.current ? 'primary.main' : tokens.text[2],
+            width: 36,
+            height: 36,
+            borderRadius: '9px',
+            flexShrink: 0,
+            bgcolor: cfg.bg,
+            border: `1px solid ${cfg.ring}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontFamily: 'var(--f-mono)',
-            fontSize: 13,
-            fontWeight: 600,
-            border: `1px solid ${mod.current ? tokens.orange.ring : tokens.line.default}`,
-            flexShrink: 0,
+            fontSize: 12,
+            fontWeight: 700,
+            color: cfg.color,
           }}
         >
-          {mod.locked ? <LockIcon sx={{ fontSize: 16 }} /> : String(idx + 1).padStart(2, '0')}
+          {String(challenge.order).padStart(2, '0')}
         </Box>
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            <Typography sx={{ fontSize: 15, fontWeight: 600 }}>{mod.title}</Typography>
-            {mod.current && (
-              <Box
-                sx={{
-                  px: 1,
-                  py: 0.25,
-                  borderRadius: '20px',
-                  bgcolor: tokens.orange.soft,
-                  border: `1px solid ${tokens.orange.ring}`,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: 'primary.main',
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Módulo atual
-              </Box>
-            )}
-            {mod.locked && (
-              <Box
-                sx={{
-                  px: 1,
-                  py: 0.25,
-                  borderRadius: '20px',
-                  bgcolor: tokens.bg[4],
-                  border: `1px solid ${tokens.line.default}`,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: tokens.text[2],
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Bloqueado
-              </Box>
-            )}
+            <Typography
+              sx={{
+                fontSize: 15,
+                fontWeight: 600,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {challenge.title}
+            </Typography>
+            <Chip
+              label={cfg.label}
+              size="small"
+              sx={{
+                height: 20,
+                fontSize: '0.6875rem',
+                fontFamily: 'var(--f-mono)',
+                border: '1px solid',
+                bgcolor: cfg.bg,
+                borderColor: cfg.ring,
+                color: cfg.color,
+              }}
+            />
           </Box>
-          <Typography sx={{ fontSize: 12, color: tokens.text[2], mt: 0.5 }}>
-            {done} de {total} aulas · {pct}% concluído
-          </Typography>
+          {challenge.lastSubmissionAt && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+              <AccessTimeIcon sx={{ fontSize: 12, color: tokens.text[2] }} />
+              <Typography sx={{ fontSize: 12, color: tokens.text[2] }}>
+                {needsRevision ? 'Revisão em ' : 'Enviado em '}
+                {new Date(challenge.lastSubmissionAt).toLocaleDateString('pt-BR')}
+              </Typography>
+            </Box>
+          )}
         </Box>
 
-        <Box sx={{ width: 100, flexShrink: 0 }}>
-          <LinearProgress
-            variant="determinate"
-            value={pct}
-            sx={{
-              height: 4,
-              borderRadius: 2,
-              bgcolor: tokens.bg[0],
-              '& .MuiLinearProgress-bar': { borderRadius: 2 },
-            }}
-          />
+        <Box sx={{ color: tokens.text[2], flexShrink: 0 }}>
+          {open ? (
+            <ExpandLessIcon sx={{ fontSize: 18 }} />
+          ) : (
+            <ExpandMoreIcon sx={{ fontSize: 18 }} />
+          )}
         </Box>
-
-        {!mod.locked && (
-          <Box sx={{ color: tokens.text[2], flexShrink: 0 }}>
-            {open ? (
-              <ExpandLessIcon sx={{ fontSize: 18 }} />
-            ) : (
-              <ExpandMoreIcon sx={{ fontSize: 18 }} />
-            )}
-          </Box>
-        )}
       </Box>
 
-      <Collapse in={open && !mod.locked}>
+      {/* Expanded body */}
+      <Collapse in={open}>
         <Box
-          sx={{ px: '22px', pb: '14px', borderTop: `1px solid ${tokens.line.default}`, pt: 0.5 }}
+          sx={{
+            px: '22px',
+            pb: '20px',
+            borderTop: `1px solid ${tokens.line.default}`,
+            pt: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
-          {mod.lessons.map((l, li) => (
-            <LessonRow key={l.id} lesson={l} onToggle={() => onToggle(li)} />
-          ))}
+          <Typography sx={{ fontSize: '0.875rem', color: tokens.text[2], lineHeight: 1.65 }}>
+            {challenge.description}
+          </Typography>
+
+          {/* YouTube tutorial */}
+          {challenge.youTubeUrl && <YouTubeEmbed url={challenge.youTubeUrl} />}
+
+          {/* Mentor comment — shown when there's feedback */}
+          {challenge.mentorComment && (
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1.5,
+                p: 1.5,
+                borderRadius: '10px',
+                bgcolor: needsRevision ? 'rgba(248,113,113,0.08)' : tokens.orange.soft,
+                border: `1px solid ${needsRevision ? 'rgba(248,113,113,0.3)' : tokens.orange.ring}`,
+              }}
+            >
+              <Box sx={{ fontSize: 18, flexShrink: 0 }}>{needsRevision ? '💬' : '✅'}</Box>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.75rem',
+                    color: needsRevision ? 'error.main' : 'primary.main',
+                    fontFamily: 'var(--f-mono)',
+                    mb: 0.25,
+                  }}
+                >
+                  {challenge.mentorComment}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
+          {/* Submission field — shown to students who haven't been approved */}
+          {isStudent && !approved && (
+            <SubmitField challenge={challenge} onSubmitted={onSubmitted} />
+          )}
+
+          {approved && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CheckCircleIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+              <Typography sx={{ fontSize: '0.8125rem', color: 'primary.main', fontWeight: 600 }}>
+                Desafio concluído — bom trabalho!
+              </Typography>
+            </Box>
+          )}
+
+          {/* Socratic AI tutor — students only, on any non-approved challenge */}
+          {isStudent && !approved && (
+            <SocraticChat challengeId={challenge.id} challengeTitle={challenge.title} />
+          )}
         </Box>
       </Collapse>
     </Box>
   );
 }
 
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default function TrilhaPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params?.id as string;
+  const challengesRef = useRef<HTMLDivElement>(null);
 
+  const user = useStore((s) => s.user);
   const trails = useStore((s) => s.trails);
-  const toggleLesson = useStore((s) => s.toggleLesson);
-  const trail = trails.find((t) => t.id === id) ?? trails[0];
+  const updateTrailProgress = useStore((s) => s.updateTrailProgress);
+  const trail = trails.find((t) => t.id === id);
+  const isStudent = user?.role === 'aluno';
 
-  const handleToggle = (modIdx: number, lessonIdx: number) => {
-    const lesson = trail.modules[modIdx]?.lessons[lessonIdx];
-    if (lesson) toggleLesson(trail.id, lesson.id);
-  };
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [loadingChallenges, setLoadingChallenges] = useState(true);
+  const [enrolled, setEnrolled] = useState(false);
+  const [enrolling, setEnrolling] = useState(false);
 
-  const currentLesson = trail.modules.flatMap((m) => m.lessons).find((l) => l.current);
+  useEffect(() => {
+    if (!id) return;
+    setLoadingChallenges(true);
+    api
+      .getTrailChallenges(id)
+      .then((c) => {
+        setChallenges(c);
+        // Propagate real progress into the store so dashboard/progress page
+        // reflects actual completion instead of the hardcoded 0.
+        const approved = c.filter((ch) => ch.lastSubmissionStatus === 'Approved').length;
+        updateTrailProgress(id, approved, c.length);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingChallenges(false));
+    if (isStudent)
+      api
+        .getEnrollment(id)
+        .then((e) => setEnrolled(e.enrolled))
+        .catch(() => {});
+  }, [id, isStudent, updateTrailProgress]);
+
+  function handleSubmitted(updated: Challenge) {
+    setChallenges((prev) => {
+      const next = prev.map((c) => (c.id === updated.id ? updated : c));
+      // Re-sync progress whenever a submission is recorded
+      const approved = next.filter((c) => c.lastSubmissionStatus === 'Approved').length;
+      updateTrailProgress(id, approved, next.length);
+      return next;
+    });
+  }
+
+  async function handleEnroll() {
+    setEnrolling(true);
+    try {
+      await api.enrollTrail(id);
+      setEnrolled(true);
+    } catch {
+    } finally {
+      setEnrolling(false);
+    }
+  }
+
+  if (!trail) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', pt: 10 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  const approvedCount = challenges.filter((c) => c.lastSubmissionStatus === 'Approved').length;
+  const progressPct =
+    challenges.length > 0 ? Math.round((approvedCount / challenges.length) * 100) : 0;
+  const firstPending = challenges.find((c) => c.lastSubmissionStatus !== 'Approved');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* Page header */}
+      {/* Header */}
       <Box
         sx={{
           display: 'grid',
@@ -342,7 +555,7 @@ export default function TrilhaPage() {
               textTransform: 'uppercase',
             }}
           >
-            Trilha personalizada pela IA · {trail.level}
+            {trail.level}
           </Typography>
           <Typography
             component="h1"
@@ -361,204 +574,175 @@ export default function TrilhaPage() {
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1.5, flexShrink: 0 }}>
-          <Button
-            variant="outlined"
-            startIcon={<BookmarkBorderIcon />}
-            sx={{
-              borderColor: tokens.line.default,
-              color: tokens.text[2],
-              textTransform: 'none',
-              '&:hover': { borderColor: tokens.line.strong, bgcolor: tokens.bg[4] },
-            }}
-          >
-            Salvar
-          </Button>
+        <Box sx={{ display: 'flex', gap: 1.5, flexShrink: 0, flexWrap: 'wrap' }}>
+          {isStudent && !enrolled && (
+            <Button
+              variant="outlined"
+              startIcon={<SchoolOutlinedIcon />}
+              onClick={handleEnroll}
+              disabled={enrolling}
+              sx={{
+                borderColor: tokens.line.default,
+                color: tokens.text[2],
+                textTransform: 'none',
+                '&:hover': { borderColor: 'primary.main', color: 'primary.main' },
+              }}
+            >
+              {enrolling ? 'Inscrevendo…' : 'Inscrever-se'}
+            </Button>
+          )}
+          {isStudent && enrolled && (
+            <Chip
+              label="✓ Inscrito"
+              sx={{
+                bgcolor: tokens.orange.soft,
+                border: `1px solid ${tokens.orange.ring}`,
+                color: 'primary.main',
+                fontFamily: 'var(--f-mono)',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+              }}
+            />
+          )}
           <Button
             variant="contained"
             startIcon={<PlayArrowIcon />}
-            onClick={() => currentLesson && router.push(`/aula/${currentLesson.id}`)}
+            onClick={() => challengesRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            disabled={challenges.length === 0}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           >
-            Retomar trilha
+            {firstPending ? 'Próximo desafio' : 'Ver desafios'}
           </Button>
         </Box>
       </Box>
 
-      {/* Stats row */}
+      {/* Stats — 3 real metrics, no placeholder AI card */}
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
           gap: 1.75,
         }}
       >
-        {/* Progress */}
-        <Box
-          sx={{
-            p: 2.5,
-            bgcolor: tokens.bg[3],
-            border: `1px solid ${tokens.line.default}`,
-            borderRadius: '14px',
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: 10,
-              color: tokens.text[2],
-              fontFamily: 'var(--f-mono)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              mb: 1,
-            }}
-          >
-            Progresso
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75 }}>
-            <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1 }}>
-              {trail.progress}
-            </Typography>
-            <Typography sx={{ color: tokens.text[2], fontSize: 14 }}>%</Typography>
-          </Box>
-          <LinearProgress
-            variant="determinate"
-            value={trail.progress}
-            sx={{
-              mt: 1.5,
-              height: 4,
-              borderRadius: 2,
-              bgcolor: tokens.bg[0],
-              '& .MuiLinearProgress-bar': { borderRadius: 2 },
-            }}
-          />
-        </Box>
-
-        {/* Aulas */}
-        <Box
-          sx={{
-            p: 2.5,
-            bgcolor: tokens.bg[3],
-            border: `1px solid ${tokens.line.default}`,
-            borderRadius: '14px',
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: 10,
-              color: tokens.text[2],
-              fontFamily: 'var(--f-mono)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              mb: 1,
-            }}
-          >
-            Aulas
-          </Typography>
-          <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1 }}>
-            {trail.lessonsDone}{' '}
-            <Box component="span" sx={{ color: tokens.text[3], fontSize: 20 }}>
-              / {trail.lessonsTotal}
-            </Box>
-          </Typography>
-          <Typography sx={{ fontSize: 12, color: tokens.text[2], mt: 1.5 }}>concluídas</Typography>
-        </Box>
-
-        {/* Tempo */}
-        <Box
-          sx={{
-            p: 2.5,
-            bgcolor: tokens.bg[3],
-            border: `1px solid ${tokens.line.default}`,
-            borderRadius: '14px',
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: 10,
-              color: tokens.text[2],
-              fontFamily: 'var(--f-mono)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              mb: 1,
-            }}
-          >
-            Tempo
-          </Typography>
-          <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1 }}>
-            {trail.hoursDone}h{' '}
-            <Box component="span" sx={{ color: tokens.text[3], fontSize: 20 }}>
-              / {trail.hoursTotal}h
-            </Box>
-          </Typography>
-          <Typography sx={{ fontSize: 12, color: tokens.text[2], mt: 1.5 }}>
-            total estimado
-          </Typography>
-        </Box>
-
-        {/* IA Card */}
-        <Box
-          sx={{
-            p: 2.5,
-            bgcolor: tokens.violet.soft,
-            border: `1px solid ${tokens.violet.ring}`,
-            borderRadius: '14px',
-          }}
-        >
+        {[
+          {
+            label: 'Progresso',
+            value: `${progressPct}%`,
+            sub: (
+              <LinearProgress
+                variant="determinate"
+                value={progressPct}
+                sx={{
+                  mt: 1.5,
+                  height: 4,
+                  borderRadius: 2,
+                  bgcolor: tokens.bg[0],
+                  '& .MuiLinearProgress-bar': { borderRadius: 2 },
+                }}
+              />
+            ),
+          },
+          {
+            label: 'Desafios',
+            value: loadingChallenges ? '—' : `${approvedCount}/${challenges.length}`,
+            sub: (
+              <Typography sx={{ fontSize: 12, color: tokens.text[2], mt: 1.5 }}>
+                aprovados
+              </Typography>
+            ),
+          },
+          {
+            label: 'Tempo estimado',
+            value: `${trail.hoursTotal}h`,
+            sub: (
+              <Typography sx={{ fontSize: 12, color: tokens.text[2], mt: 1.5 }}>
+                para concluir
+              </Typography>
+            ),
+          },
+        ].map((s) => (
           <Box
+            key={s.label}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.75,
-              fontSize: 10,
-              color: tokens.violet.main,
-              fontFamily: 'var(--f-mono)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              mb: 1,
+              p: 2.5,
+              bgcolor: tokens.bg[3],
+              border: `1px solid ${tokens.line.default}`,
+              borderRadius: '14px',
             }}
           >
-            <AutoAwesomeIcon sx={{ fontSize: 12 }} />
-            <span>IA</span>
+            <Typography
+              sx={{
+                fontSize: 10,
+                color: tokens.text[2],
+                fontFamily: 'var(--f-mono)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                mb: 1,
+              }}
+            >
+              {s.label}
+            </Typography>
+            <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 28, lineHeight: 1 }}>
+              {s.value}
+            </Typography>
+            {s.sub}
           </Box>
-          <Typography sx={{ fontSize: 13, color: 'text.primary', lineHeight: 1.45 }}>
-            {trail.aiNote}
-          </Typography>
-        </Box>
+        ))}
       </Box>
 
-      {/* Modules section */}
-      <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            mb: 2,
-          }}
-        >
+      {/* Challenges */}
+      <Box ref={challengesRef}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
           <Typography sx={{ fontFamily: 'var(--f-serif)', fontSize: 22, whiteSpace: 'nowrap' }}>
-            {trail.modules.length} módulos
+            {loadingChallenges
+              ? '…'
+              : `${challenges.length} desafio${challenges.length !== 1 ? 's' : ''}`}
           </Typography>
           <Box sx={{ flex: 1, height: '1px', bgcolor: tokens.line.default }} />
-          <Button
-            size="small"
-            variant="text"
-            startIcon={<FilterListIcon sx={{ fontSize: 14 }} />}
-            sx={{
-              fontSize: 12,
-              color: tokens.text[2],
-              textTransform: 'none',
-              flexShrink: 0,
-              '&:hover': { color: 'text.primary', bgcolor: tokens.bg[4] },
-            }}
-          >
-            Filtrar
-          </Button>
+          {!loadingChallenges && challenges.length > 0 && (
+            <Typography
+              sx={{
+                fontSize: '0.75rem',
+                color: tokens.text[2],
+                fontFamily: 'var(--f-mono)',
+                flexShrink: 0,
+              }}
+            >
+              {approvedCount}/{challenges.length} aprovados
+            </Typography>
+          )}
         </Box>
 
-        {trail.modules.map((m, i) => (
-          <ModuleCard key={m.id} mod={m} idx={i} onToggle={(li) => handleToggle(i, li)} />
-        ))}
+        {loadingChallenges ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
+            <CircularProgress size={28} />
+          </Box>
+        ) : challenges.length === 0 ? (
+          <Box
+            sx={{
+              py: 5,
+              textAlign: 'center',
+              bgcolor: tokens.bg[3],
+              border: `1px solid ${tokens.line.default}`,
+              borderRadius: '14px',
+            }}
+          >
+            <AssignmentOutlinedIcon sx={{ fontSize: 36, color: tokens.text[3], mb: 1 }} />
+            <Typography sx={{ color: tokens.text[2], fontSize: '0.9rem' }}>
+              Nenhum desafio cadastrado ainda.
+            </Typography>
+          </Box>
+        ) : (
+          challenges.map((c, i) => (
+            <ChallengeCard
+              key={c.id}
+              challenge={c}
+              index={i}
+              isStudent={isStudent}
+              onSubmitted={handleSubmitted}
+            />
+          ))
+        )}
       </Box>
     </Box>
   );

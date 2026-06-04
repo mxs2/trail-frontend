@@ -17,10 +17,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
 
-  reporter: [
-    ['list'],
-    ['html', { outputFolder: 'tests/reports/playwright', open: 'never' }],
-  ],
+  reporter: [['list'], ['html', { outputFolder: 'tests/reports/playwright', open: 'never' }]],
 
   use: {
     baseURL: BASE_URL,

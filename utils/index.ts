@@ -33,8 +33,7 @@ export function filterTrails(trails: Trail[], query: string): Trail[] {
   if (!normalized) return trails;
   return trails.filter(
     (trail) =>
-      normalize(trail.title).includes(normalized) ||
-      normalize(trail.subtitle).includes(normalized)
+      normalize(trail.title).includes(normalized) || normalize(trail.subtitle).includes(normalized)
   );
 }
 

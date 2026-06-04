@@ -53,7 +53,11 @@ const eslintConfig = [
 
   // ── Shared test helpers (no test bodies, so skip jest's test-only rules) ─────
   {
-    files: ['tests/utils/**/*.{ts,tsx}', 'tests/mocks/**/*.{ts,tsx}', 'tests/fixtures/**/*.{ts,tsx}'],
+    files: [
+      'tests/utils/**/*.{ts,tsx}',
+      'tests/mocks/**/*.{ts,tsx}',
+      'tests/fixtures/**/*.{ts,tsx}',
+    ],
     ...jest.configs['flat/recommended'],
     rules: {
       'jest/no-export': 'off',

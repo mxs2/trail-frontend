@@ -1,64 +1,53 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User, Trail, Lesson, TrilhaPersonalizada } from '../types';
-import { MOCK_TRAILS } from '../mocks/trails';
+import type { User, Trail } from '../types';
 
 interface AppState {
-  // auth
+  // ── Auth ──────────────────────────────────────────────────────────────────
   user: User | null;
   setUser: (user: User | null) => void;
-  // trails list (sidebar + dashboard + trilha/[id])
+
+  // ── Trails ────────────────────────────────────────────────────────────────
   trails: Trail[];
   setTrails: (trails: Trail[]) => void;
-  toggleLesson: (trailId: string, lessonId: string) => void;
-  // active trail (trilha/[id] page)
-  currentTrail: Trail | null;
-  setCurrentTrail: (trail: Trail | null) => void;
-  // active lesson (aula/[id] page)
-  currentLesson: Lesson | null;
-  setCurrentLesson: (lesson: Lesson | null) => void;
-  // favorited trail ids
+
+  /**
+   * Updates a single trail's computed progress fields after challenges load.
+   * Called from the trail detail page once we know how many challenges
+   * are Approved. This propagates real progress into the dashboard and
+   * progress page without a full trail list refetch.
+   */
+  updateTrailProgress: (trailId: string, approved: number, total: number) => void;
+
+  // ── Favorites ─────────────────────────────────────────────────────────────
   favorites: string[];
   toggleFavorite: (trailId: string) => void;
   isFavorite: (trailId: string) => boolean;
-  // AI personalization for the logged-in user
-  aiRecomendacao: TrilhaPersonalizada | null;
-  setAiRecomendacao: (rec: TrilhaPersonalizada | null) => void;
-  // global loading flag
-  isLoading: boolean;
-  setIsLoading: (isLoading: boolean) => void;
 }
 
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
+      // ── Auth ────────────────────────────────────────────────────────────
       user: null,
       setUser: (user) => set({ user }),
 
-      trails: MOCK_TRAILS,
+      // ── Trails ──────────────────────────────────────────────────────────
+      trails: [],
       setTrails: (trails) => set({ trails }),
-      toggleLesson: (trailId, lessonId) =>
+
+      updateTrailProgress: (trailId, approved, total) =>
         set((state) => ({
           trails: state.trails.map((t) => {
             if (t.id !== trailId) return t;
-            const modules = t.modules.map((m) => ({
-              ...m,
-              lessons: m.lessons.map((l) => (l.id !== lessonId ? l : { ...l, done: !l.done })),
-            }));
-            const total = modules.reduce((a, m) => a + m.lessons.length, 0);
-            const done = modules.reduce((a, m) => a + m.lessons.filter((l) => l.done).length, 0);
-            const progress = Math.round((done / total) * 100);
-            const hoursDone = Math.round((progress / 100) * t.hoursTotal * 10) / 10;
-            return { ...t, modules, lessonsDone: done, progress, hoursDone };
+            const progress = total > 0 ? Math.round((approved / total) * 100) : 0;
+            const hoursTotal = t.hoursTotal;
+            const hoursDone = Math.round((progress / 100) * hoursTotal * 10) / 10;
+            return { ...t, progress, lessonsDone: approved, lessonsTotal: total, hoursDone };
           }),
         })),
 
-      currentTrail: null,
-      setCurrentTrail: (currentTrail) => set({ currentTrail }),
-
-      currentLesson: null,
-      setCurrentLesson: (currentLesson) => set({ currentLesson }),
-
+      // ── Favorites ────────────────────────────────────────────────────────
       favorites: [],
       toggleFavorite: (trailId) =>
         set((state) => ({
@@ -67,16 +56,11 @@ export const useStore = create<AppState>()(
             : [...state.favorites, trailId],
         })),
       isFavorite: (trailId) => get().favorites.includes(trailId),
-
-      aiRecomendacao: null,
-      setAiRecomendacao: (aiRecomendacao) => set({ aiRecomendacao }),
-
-      isLoading: false,
-      setIsLoading: (isLoading) => set({ isLoading }),
     }),
     {
       name: 'trail-auth',
-      // Only user + favorites survive a refresh. Everything else is re-fetched from mocks.
+      // Only user + favorites survive a browser refresh.
+      // Trails are re-fetched by RequireAuth/useAuthGuard on each session.
       partialize: (state) => ({ user: state.user, favorites: state.favorites }),
     }
   )

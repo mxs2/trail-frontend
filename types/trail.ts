@@ -66,3 +66,18 @@ export interface TrilhaPersonalizada {
   /** Short note from the assigned mentor. Empty string when no mentor is assigned. */
   notaDoMentor: string;
 }
+
+export interface Challenge {
+  id: string;
+  trailId: string;
+  title: string;
+  description: string;
+  order: number;
+  createdAt: string;
+  youTubeUrl: string | null;
+  isCompleted: boolean;
+  lastSubmissionAt: string | null;
+  /** "Submitted" | "Approved" | "NeedsRevision" */
+  lastSubmissionStatus: 'Submitted' | 'Approved' | 'NeedsRevision' | null;
+  mentorComment: string | null;
+}

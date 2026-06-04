@@ -7,6 +7,7 @@ export type {
   AiSugestao,
   AiRecomendacao,
   TrilhaPersonalizada,
+  Challenge,
 } from './trail';
 
 export type { UserRole, User, WeeklyActivity } from './user';

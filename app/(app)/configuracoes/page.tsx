@@ -1,16 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
 import Divider from '@mui/material/Divider';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import { tokens } from '../../../lib/tokens';
+import { api, UserSettings } from '../../../services/api';
 
 function SectionHeader({
   icon,
@@ -87,9 +85,7 @@ function ToggleRow({
           sx={{
             flexShrink: 0,
             '& .MuiSwitch-switchBase.Mui-checked': { color: 'primary.main' },
-            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-              bgcolor: 'primary.main',
-            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: 'primary.main' },
           }}
         />
       </Box>
@@ -98,84 +94,43 @@ function ToggleRow({
   );
 }
 
-function SelectRow({
-  label,
-  description,
-  value,
-  options,
-  onChange,
-  last,
-}: {
-  label: string;
-  description?: string;
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (v: string) => void;
-  last?: boolean;
-}) {
-  return (
-    <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 2,
-          py: 1.75,
-        }}
-      >
-        <Box>
-          <Typography sx={{ fontSize: '0.875rem', fontWeight: 500 }}>{label}</Typography>
-          {description && (
-            <Typography sx={{ fontSize: '0.75rem', color: tokens.text[2], mt: 0.25 }}>
-              {description}
-            </Typography>
-          )}
-        </Box>
-        <Select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          size="small"
-          sx={{
-            flexShrink: 0,
-            minWidth: 130,
-            fontSize: '0.8125rem',
-            bgcolor: tokens.bg[0],
-            color: 'text.primary',
-            '& .MuiOutlinedInput-notchedOutline': { borderColor: tokens.line.strong },
-            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: tokens.line.strong },
-            '& .MuiSvgIcon-root': { color: tokens.text[2] },
-          }}
-        >
-          {options.map((o) => (
-            <MenuItem key={o.value} value={o.value} sx={{ fontSize: '0.8125rem' }}>
-              {o.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
-      {!last && <Divider sx={{ borderColor: tokens.line.default }} />}
-    </>
-  );
-}
+const DEFAULT_SETTINGS: UserSettings = {
+  twoFactorEnabled: false,
+  publicProfile: true,
+  emailNotifications: true,
+  studyReminder: true,
+  aiSuggestions: false,
+  weeklyReport: false,
+  language: 'pt-BR',
+  dailyStudyGoal: '1h',
+  autoplay: true,
+  subtitles: false,
+};
 
 export default function ConfiguracoesPage() {
-  const [twoFactor, setTwoFactor] = useState(false);
-  const [publicProfile, setPublicProfile] = useState(true);
+  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
+  const loaded = useRef(false);
 
-  const [emailNotif, setEmailNotif] = useState(true);
-  const [progressReminder, setProgressReminder] = useState(true);
-  const [aiSuggestions, setAiSuggestions] = useState(true);
-  const [weeklyReport, setWeeklyReport] = useState(false);
+  useEffect(() => {
+    api
+      .getSettings()
+      .then((s) => {
+        setSettings(s);
+        loaded.current = true;
+      })
+      .catch(() => {
+        loaded.current = true;
+      });
+  }, []);
 
-  const [language, setLanguage] = useState('pt-BR');
-  const [studyGoal, setStudyGoal] = useState('1h');
-  const [autoplay, setAutoplay] = useState(true);
-  const [subtitles, setSubtitles] = useState(false);
+  function update<K extends keyof UserSettings>(key: K, value: UserSettings[K]) {
+    const next = { ...settings, [key]: value };
+    setSettings(next);
+    if (loaded.current) api.updateSettings(next).catch(() => {});
+  }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 680 }}>
-      {/* Header */}
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 620 }}>
       <Box>
         <Typography
           component="h1"
@@ -190,7 +145,7 @@ export default function ConfiguracoesPage() {
           Configurações
         </Typography>
         <Typography sx={{ color: tokens.text[2], fontSize: '0.875rem' }}>
-          Personalize sua experiência na plataforma
+          Gerencie sua conta e notificações
         </Typography>
       </Box>
 
@@ -211,14 +166,14 @@ export default function ConfiguracoesPage() {
         <ToggleRow
           label="Autenticação em dois fatores"
           description="Adiciona uma camada extra de segurança ao login"
-          checked={twoFactor}
-          onChange={setTwoFactor}
+          checked={settings.twoFactorEnabled}
+          onChange={(v) => update('twoFactorEnabled', v)}
         />
         <ToggleRow
           label="Perfil público"
-          description="Outros alunos podem ver seu progresso"
-          checked={publicProfile}
-          onChange={setPublicProfile}
+          description="Seu perfil pode ser visto por outros usuários da plataforma"
+          checked={settings.publicProfile}
+          onChange={(v) => update('publicProfile', v)}
           last
         />
       </Box>
@@ -235,82 +190,13 @@ export default function ConfiguracoesPage() {
         <SectionHeader
           icon={<NotificationsOutlinedIcon sx={{ fontSize: 18 }} />}
           title="Notificações"
-          subtitle="Escolha o que você quer receber"
+          subtitle="E-mails enviados pela plataforma"
         />
         <ToggleRow
-          label="E-mails de novidades"
-          description="Novas aulas e atualizações de trilha"
-          checked={emailNotif}
-          onChange={setEmailNotif}
-        />
-        <ToggleRow
-          label="Lembrete de estudo"
-          description="Aviso diário para manter a sequência"
-          checked={progressReminder}
-          onChange={setProgressReminder}
-        />
-        <ToggleRow
-          label="Sugestões da IA"
-          description="Recomendações personalizadas do Tutor IA"
-          checked={aiSuggestions}
-          onChange={setAiSuggestions}
-        />
-        <ToggleRow
-          label="Relatório semanal"
-          description="Resumo do seu progresso por e-mail toda semana"
-          checked={weeklyReport}
-          onChange={setWeeklyReport}
-          last
-        />
-      </Box>
-
-      {/* Preferências */}
-      <Box
-        sx={{
-          p: 3,
-          bgcolor: tokens.bg[3],
-          border: `1px solid ${tokens.line.default}`,
-          borderRadius: '16px',
-        }}
-      >
-        <SectionHeader
-          icon={<TuneOutlinedIcon sx={{ fontSize: 18 }} />}
-          title="Preferências"
-          subtitle="Ajuste o comportamento da plataforma"
-        />
-        <SelectRow
-          label="Idioma"
-          value={language}
-          options={[
-            { value: 'pt-BR', label: 'Português (BR)' },
-            { value: 'en-US', label: 'English (US)' },
-            { value: 'es', label: 'Español' },
-          ]}
-          onChange={setLanguage}
-        />
-        <SelectRow
-          label="Meta diária de estudo"
-          description="Duração que você quer estudar por dia"
-          value={studyGoal}
-          options={[
-            { value: '30m', label: '30 minutos' },
-            { value: '1h', label: '1 hora' },
-            { value: '2h', label: '2 horas' },
-            { value: '3h', label: '3 horas ou mais' },
-          ]}
-          onChange={setStudyGoal}
-        />
-        <ToggleRow
-          label="Reprodução automática"
-          description="Próxima aula inicia automaticamente"
-          checked={autoplay}
-          onChange={setAutoplay}
-        />
-        <ToggleRow
-          label="Legendas por padrão"
-          description="Exibir legendas em todos os vídeos"
-          checked={subtitles}
-          onChange={setSubtitles}
+          label="E-mails da plataforma"
+          description="Atualizações, novidades e comunicados do Trail"
+          checked={settings.emailNotifications}
+          onChange={(v) => update('emailNotifications', v)}
           last
         />
       </Box>
