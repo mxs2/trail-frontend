@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { seedAuth } from '../../setup/playwright.setup';
+import { signInViaUi } from '../../setup/playwright.setup';
 
 test.describe('Protected routes', () => {
   test('redirects an unauthenticated visitor from /dashboard to /signin', async ({ page }) => {
@@ -13,8 +13,9 @@ test.describe('Protected routes', () => {
   });
 
   test('lets an authenticated user reach the dashboard', async ({ page }) => {
-    await seedAuth(page);
-    await page.goto('/dashboard');
+    // Real sign-in lands on the dashboard with an in-memory session (no
+    // cold-load hydration race — see tests/setup/playwright.setup.ts).
+    await signInViaUi(page);
 
     await expect(page).toHaveURL(/\/dashboard/);
     await expect(page.getByRole('heading', { name: /Olá,/ })).toBeVisible();

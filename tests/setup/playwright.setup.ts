@@ -1,16 +1,17 @@
-// Shared Playwright helpers. Keeps auth seeding, the login flow and the mocked
-// backend in one place so specs stay focused on behaviour.
+// Shared Playwright helpers. Keeps the login flow and the mocked backend in one
+// place so specs stay focused on behaviour.
 //
 // The frontend now talks to a real backend via fetch('/api/...') (see
 // lib/api/client.ts). CI runs the frontend only, so e2e specs intercept every
 // `/api/**` request and serve deterministic fixtures via `mockBackend`.
+//
+// Authenticated specs sign in through the real form (`signInViaUi`) rather than
+// pre-seeding localStorage: the in-memory session that login produces avoids the
+// persist-rehydration race a cold `goto('/dashboard')` is subject to (the guard
+// can briefly see no user and redirect to /signin before hydration settles).
 
 import type { Page, Route } from '@playwright/test';
 import { MOCK_USER } from '../../mocks/user';
-
-const PERSIST_KEY = 'trail-auth';
-const TOKEN_KEY = 'trail_token';
-const REFRESH_KEY = 'trail_refresh';
 
 // ── Backend fixtures (response shapes match lib/api/*) ────────────────────────
 
@@ -107,27 +108,6 @@ export async function mockBackend(page: Page): Promise<void> {
     // ── Fallback ──────────────────────────────────────────────────────────────
     return json(route, []);
   });
-}
-
-/**
- * Seed an authenticated session by pre-populating the Zustand persist store
- * (matching zustand/middleware `persist`) and the auth tokens read by the API
- * client. Installs the mocked backend. Must be called before the first
- * navigation.
- */
-export async function seedAuth(page: Page, user = MOCK_USER): Promise<void> {
-  await mockBackend(page);
-  await page.addInitScript(
-    ([persistKey, tokenKey, refreshKey, value]) => {
-      window.localStorage.setItem(
-        persistKey as string,
-        JSON.stringify({ state: { user: value, favorites: [] }, version: 0 })
-      );
-      window.localStorage.setItem(tokenKey as string, 'e2e-access-token');
-      window.localStorage.setItem(refreshKey as string, 'e2e-refresh-token');
-    },
-    [PERSIST_KEY, TOKEN_KEY, REFRESH_KEY, user] as const
-  );
 }
 
 /** Drive the real sign-in form end to end and wait for the dashboard. */
